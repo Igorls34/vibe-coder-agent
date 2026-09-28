@@ -2,198 +2,198 @@
 
 # ⚡ Vibe Coder Kit
 
-**AI Destekli Profesyonel Yazılım Geliştirme Agent Framework'ü**
+**Agent Framework para Desenvolvimento Profissional de Software com IA**
 
-*AI kod asistanını disiplinli, süreç odaklı bir geliştirme ekibine dönüştürün.*
+*Transforme seu assistente de código com IA em uma equipe de desenvolvimento disciplinada e focada em processo.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![OpenCode Compatible](https://img.shields.io/badge/OpenCode-Compatible-purple.svg)](https://opencode.ai)
-[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)](#katkıda-bulunmak)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)](#como-contribuir)
 
 </div>
 
 ---
 
-## 🎯 Vibe Coder Kit Nedir?
+## 🎯 O Que é o Vibe Coder Kit?
 
-Vibe Coder Kit, AI kod asistanlarını (ör. [OpenCode](https://opencode.ai)) yapılandırılmış, süreç odaklı bir geliştirme ekibine dönüştüren **yapılandırma odaklı bir agent framework'üdür**. Anlık prompt yazmak yerine, şunlara sahip olursunuz:
+O Vibe Coder Kit é um **agent framework orientado a configuração** que transforma assistentes de código com IA (como o [OpenCode](https://opencode.ai)) em uma equipe de desenvolvimento estruturada e focada em processo. Em vez de escrever prompts improvisados, você tem:
 
-- 🤖 **4 Uzman Agent Personalası** — Tasarımcı, Frontend Geliştirici, Backend Geliştirici, DevOps
-- 🛠️ **12 Kanıtlanmış Skill** — Fikir üretiminden kriz yönetimine yapılandırılmış iş akışları
-- 📏 **3 Kural Seti** — Kod hijyeni, kalite ve güvenlik standartları
-- 🧠 **Kalıcı Bilgi Tabanı** — Oturumlar arası bilgi paylaşımı, tekrarlanan hataları önler
+- 🤖 **4 Personas de Agentes Especialistas** — Designer, Desenvolvedor Frontend, Desenvolvedor Backend, DevOps
+- 🛠️ **12 Skills Comprovadas** — Fluxos de trabalho estruturados, da geração de ideias à gestão de crises
+- 📏 **3 Conjuntos de Regras** — Padrões de higiene de código, qualidade e segurança
+- 🧠 **Base de Conhecimento Persistente** — Conhecimento compartilhado entre sessões, o que evita erros repetidos
 
-> **"Çalışıyor" ≠ "Bitti".** Testler geçiyor + temiz kod + dokümantasyon güncel = bitti.
+> **"Funciona" ≠ "Está pronto".** Testes passando + código limpo + documentação atualizada = está pronto.
 
 ---
 
-## ✨ Öne Çıkan Özellikler
+## ✨ Recursos em Destaque
 
-### 🎭 Agent Personalaları
+### 🎭 Personas de Agentes
 
-| Agent | İsim | Uzmanlık Alanı |
+| Agente | Nome | Área de Especialização |
 |-------|------|---------------|
-| 🎨 **Tasarımcı** | Aria | UI/UX, motion design, tasarım sistemleri, erişilebilirlik |
-| 💻 **Frontend** | Felix | React/Vue, CSS mimarisi, performans, Core Web Vitals |
-| ⚙️ **Backend** | Bora | API tasarımı, veritabanları, auth, güvenlik, mikroservisler |
-| 🚀 **DevOps** | Deva | Docker, CI/CD, cloud altyapı, izleme, kriz yönetimi |
+| 🎨 **Designer** | Aria | UI/UX, design de movimento, sistemas de design, acessibilidade |
+| 💻 **Frontend** | Felix | React/Vue, arquitetura CSS, performance, Core Web Vitals |
+| ⚙️ **Backend** | Bora | Design de API, bancos de dados, auth, segurança, microsserviços |
+| 🚀 **DevOps** | Deva | Docker, CI/CD, infraestrutura em cloud, monitoramento, gestão de crises |
 
-<!-- Her agent, kendi alanında senior seviye uzman olarak tasarlanmıştır. Detaylı bilgi için .agent/agents/ dizinine bakabilirsiniz. -->
+<!-- Cada agente foi projetado como um especialista sênior em sua própria área. Consulte o diretório .agent/agents/ para mais detalhes. -->
 
-### 🛠️ Skill'ler (Yapılandırılmış İş Akışları)
+### 🛠️ Skills (Fluxos de Trabalho Estruturados)
 
-| Skill | Ne Zaman Kullanılır | Ne Yapar |
+| Skill | Quando Usar | O Que Faz |
 |-------|---------------------|----------|
-| `project-context-primer` | Her oturum başında *(zorunlu)* | Proje bağlamını, kararları ve tuzakları yükler |
-| `prompt-enhancer` | Belirsiz veya eksik istekler | Kapsamı netleştirir, eksik boyutları tamamlar |
-| `brainstorming` | Yeni özellik veya proje fikirleri | Sokratik yöntemle rafine eder → scope dokümanı üretir |
-| `writing-plans` | Scope onayından sonra | Checkpoint'li implementasyon planı oluşturur |
-| `architecture-review` | Kod yazmaya başlamadan önce | Planı stres testine tabi tutar, riskleri işaretler |
-| `test-driven-execution` | Her özellik implementasyonunda | Test önce, kod sonra yaklaşımı uygular |
-| `code-review` | Her commit öncesinde | Pre-commit checklist + geri bildirim yanıtlama |
-| `github` | Tüm git işlemlerinde | Conventional commits, branch yönetimi, PR iş akışı |
-| `knowledge-base-update` | Önemli bir şey öğrenildiğinde | Oturumlar arası kalıcı bilgi depolama |
-| `documentation-sync` | Önemli kod değişikliklerinden sonra | Dokümantasyon ve kodun uyumunu sağlar |
-| `dependency-audit` | Release öncesi / aylık rutin | Güvenlik açıklarını ve eski paketleri tarama |
-| `incident-response` | Production sorunlarında | Triyaj → içerme → düzeltme → post-mortem |
+| `project-context-primer` | No início de cada sessão *(obrigatório)* | Carrega o contexto do projeto, as decisões e as armadilhas |
+| `prompt-enhancer` | Solicitações ambíguas ou incompletas | Clareia o escopo e preenche as dimensões que faltam |
+| `brainstorming` | Novas funcionalidades ou ideias de projeto | Refina com método socrático → gera um documento de escopo |
+| `writing-plans` | Após a aprovação do escopo | Cria um plano de implementação com checkpoints |
+| `architecture-review` | Antes de começar a escrever código | Submete o plano a um teste de estresse e sinaliza os riscos |
+| `test-driven-execution` | Na implementação de cada funcionalidade | Aplica a abordagem teste primeiro, código depois |
+| `code-review` | Antes de cada commit | Checklist pré-commit + resposta ao feedback |
+| `github` | Em todas as operações git | Conventional commits, gestão de branches, fluxo de trabalho de PR |
+| `knowledge-base-update` | Sempre que algo importante for aprendido | Armazenamento de conhecimento persistente entre sessões |
+| `documentation-sync` | Após mudanças de código importantes | Garante a conformidade entre documentação e código |
+| `dependency-audit` | Antes do release / rotina mensal | Varredura de vulnerabilidades e pacotes desatualizados |
+| `incident-response` | Em problemas de produção | Triagem → contenção → correção → post-mortem |
 
-<!-- Skill'ler bağımsız olarak kullanılabilir, ancak tam verim için önerilen sırayla çalıştırılmalıdır. -->
+<!-- As skills podem ser usadas de forma independente, mas para obter o máximo de produtividade, execute-as na ordem recomendada. -->
 
-### 📏 Kurallar (Zorunlu Standartlar)
+### 📏 Regras (Padrões Obrigatórios)
 
-| Kural | Amacı |
+| Regra | Finalidade |
 |-------|-------|
-| `code-hygiene` | Yorum stili, debug log temizliği, hassas veri yönetimi |
-| `code-quality` | Aşırı mühendislik yapmadan DRY, soyutlama eşiği |
-| `safety` | Yıkıcı komut onayı, rollback planları |
+| `code-hygiene` | Estilo de comentários, limpeza de logs de depuração, tratamento de dados sensíveis |
+| `code-quality` | DRY sem overengineering, limite de abstração |
+| `safety` | Aprovação de comandos destrutivos, planos de rollback |
 
-<!-- Kurallar öneri değil, zorunluluktur. Agent bu kuralları her görevde uygular. -->
+<!-- As regras não são recomendações, são obrigatórias. O agente aplica essas regras em todas as tarefas. -->
 
 ---
 
-## 🚀 Kurulum ve Kullanım
+## 🚀 Instalação e Uso
 
-Vibe Coder Kit'i iki şekilde kullanabilirsiniz: **mevcut projenize entegre ederek** veya **yeni bir proje olarak başlatarak**.
+Você pode usar o Vibe Coder Kit de duas formas: **integrando-o ao seu projeto existente** ou **iniciando um novo projeto**.
 
-### Yöntem 1: Mevcut Projenize Entegre Etme (Önerilen)
+### Método 1: Integrar ao Projeto Existente (Recomendado)
 
-Mevcut bir projeniz varsa, sadece agent yapılandırma dosyalarını projenize kopyalayın:
+Se você já tem um projeto, basta copiar os arquivos de configuração de agente para o seu projeto:
 
 ```bash
-# 1. Repoyu indirin (geçici bir klasöre)
+# 1. Baixe o repositório (em uma pasta temporária)
 git clone https://github.com/omergocmen/vibe-coder-kit.git /tmp/vibe-coder-kit
 
-# 2. .agent dizinini projenize kopyalayın
-cp -r /tmp/vibe-coder-kit/.agent /projenizin/yolu/
+# 2. Copie o diretório .agent para o seu projeto
+cp -r /tmp/vibe-coder-kit/.agent /caminho/do/seu/projeto/
 
-# 3. OpenCode yapılandırma dosyasını kopyalayın
-cp /tmp/vibe-coder-kit/opencode.json /projenizin/yolu/
+# 3. Copie o arquivo de configuração do OpenCode
+cp /tmp/vibe-coder-kit/opencode.json /caminho/do/seu/projeto/
 
-# 4. AGENTS.md dosyasını kopyalayın (OpenCode bunu otomatik okur)
-cp /tmp/vibe-coder-kit/AGENTS.md /projenizin/yolu/
+# 4. Copie o arquivo AGENTS.md (o OpenCode o lê automaticamente)
+cp /tmp/vibe-coder-kit/AGENTS.md /caminho/do/seu/projeto/
 
-# 5. Geçici dosyaları temizleyin
+# 5. Limpe os arquivos temporários
 rm -rf /tmp/vibe-coder-kit
 
-# 6. Proje dizinine gidin
-cd /projenizin/yolu
+# 6. Vá para o diretório do projeto
+cd /caminho/do/seu/projeto
 ```
 
-**Windows (PowerShell) kullanıcıları:**
+**Usuários de Windows (PowerShell):**
 
 ```powershell
-# 1. Repoyu indirin
+# 1. Baixe o repositório
 git clone https://github.com/omergocmen/vibe-coder-kit.git "$env:TEMP\vibe-coder-kit"
 
-# 2. .agent dizinini projenize kopyalayın
-Copy-Item -Recurse "$env:TEMP\vibe-coder-kit\.agent" "C:\projenizin\yolu\.agent"
+# 2. Copie o diretório .agent para o seu projeto
+Copy-Item -Recurse "$env:TEMP\vibe-coder-kit\.agent" "C:\caminho\do\seu\projeto\.agent"
 
-# 3. Yapılandırma dosyalarını kopyalayın
-Copy-Item "$env:TEMP\vibe-coder-kit\opencode.json" "C:\projenizin\yolu\"
-Copy-Item "$env:TEMP\vibe-coder-kit\AGENTS.md" "C:\projenizin\yolu\"
+# 3. Copie os arquivos de configuração
+Copy-Item "$env:TEMP\vibe-coder-kit\opencode.json" "C:\caminho\do\seu\projeto\"
+Copy-Item "$env:TEMP\vibe-coder-kit\AGENTS.md" "C:\caminho\do\seu\projeto\"
 
-# 4. Geçici dosyaları temizleyin
+# 4. Limpe os arquivos temporários
 Remove-Item -Recurse "$env:TEMP\vibe-coder-kit"
 ```
 
-### Yöntem 2: Yeni Proje Olarak Başlatma
+### Método 2: Iniciar como Novo Projeto
 
-Sıfırdan yeni bir proje başlatıyorsanız, repoyu doğrudan klonlayıp üzerine inşa edin:
+Se você está começando um novo projeto do zero, clone o repositório diretamente e construa sobre ele:
 
 ```bash
-# Repoyu klonlayın
-git clone https://github.com/omergocmen/vibe-coder-kit.git benim-projem
-cd benim-projem
+# Clone o repositório
+git clone https://github.com/omergocmen/vibe-coder-kit.git meu-projeto
+cd meu-projeto
 
-# Artık .agent/, opencode.json ve AGENTS.md hazır
-# Kendi kodunuzu bu dizin yapısının üzerine ekleyin
+# Agora .agent/, opencode.json e AGENTS.md já estão prontos
+# Adicione seu próprio código sobre essa estrutura de diretórios
 ```
 
-### İndirdikten Sonra Ne Yapmalısınız?
+### O Que Fazer Depois de Baixar?
 
-1. **[OpenCode](https://opencode.ai) kurun** — Henüz kurmadıysanız:
+1. **[Instale o OpenCode](https://opencode.ai)** — Se você ainda não tiver instalado:
    ```bash
-   # npm ile global kurulum
+   # Instalação global via npm
    npm install -g opencode
-   
-   # veya doğrudan çalıştırın
+
+   # ou execute diretamente
    npx opencode
    ```
 
-2. **Proje dizininde OpenCode'u başlatın:**
+2. **Inicie o OpenCode no diretório do projeto:**
    ```bash
-   cd /projenizin/yolu
+   cd /caminho/do/seu/projeto
    opencode
    ```
 
-3. **İlk oturumda** OpenCode otomatik olarak `AGENTS.md` dosyasını okuyacak ve `project-context-primer` skill'ini çalıştıracaktır. Agent size proje hakkında sorular soracak ve bağlamı yükleyecektir.
+3. **Na primeira sessão**, o OpenCode lerá automaticamente o arquivo `AGENTS.md` e executará a skill `project-context-primer`. O agente fará perguntas sobre o projeto e carregará o contexto.
 
-4. **Bilgi tabanını başlatın** — İlk oturumda `.agent/knowledge/INDEX.md` dosyası oluşturulur. Bundan sonra tüm kararlar, kurallar ve tuzaklar otomatik olarak kaydedilir.
+4. **Inicie a base de conhecimento** — Na primeira sessão, o arquivo `.agent/knowledge/INDEX.md` é criado. A partir daí, todas as decisões, regras e armadilhas passam a ser registradas automaticamente.
 
-### Yapıyı Özelleştirme
+### Customização da Estrutura
 
-Projenize özel özelleştirmeler yapabilirsiniz:
+Você pode fazer customizações específicas para o seu projeto:
 
-- **Agent personalarını düzenleyin:** `.agent/agents/` dizinindeki dosyaları projenizin ihtiyacına göre değiştirin
-- **Yeni skill ekleyin:** `.agent/skills/yeni-skill/SKILL.md` oluşturun
-- **Kuralları sıkılaştırın:** `.agent/rules/` dizinindeki dosyaları düzenleyin
-- **Gereksiz agent'ları kaldırın:** Örneğin sadece backend geliştirme yapıyorsanız, `designer.md` ve `frontend-dev.md` dosyalarını silebilirsiniz
+- **Edite as personas de agente:** altere os arquivos do diretório `.agent/agents/` conforme a necessidade do seu projeto
+- **Adicione uma nova skill:** crie `.agent/skills/nova-skill/SKILL.md`
+- **Torne as regras mais rigorosas:** edite os arquivos do diretório `.agent/rules/`
+- **Remova os agentes desnecessários:** por exemplo, se você só faz desenvolvimento backend, pode excluir os arquivos `designer.md` e `frontend-dev.md`
 
-<!-- Her projenin ihtiyacı farklıdır. Framework'ü projenize göre özelleştirmekten çekinmeyin. -->
+<!-- Cada projeto tem necessidades diferentes. Não tenha medo de customizar o framework de acordo com o seu projeto. -->
 
 ---
 
-## 📁 Proje Yapısı
+## 📁 Estrutura do Projeto
 
 ```
 vibe-coder-kit/
-├── AGENTS.md                          # Oturum başlatma talimatları (OpenCode tarafından otomatik okunur)
-├── opencode.json                      # OpenCode yapılandırma dosyası
+├── AGENTS.md                          # Instruções de início de sessão (lidas automaticamente pelo OpenCode)
+├── opencode.json                      # Arquivo de configuração do OpenCode
 ├── .agent/
-│   ├── agents/                        # Uzman personaları
-│   │   ├── designer.md                # Aria — UI/UX ve motion design
-│   │   ├── frontend-dev.md            # Felix — Frontend mühendisliği
-│   │   ├── backend-dev.md             # Bora — Backend ve sistemler
-│   │   └── devops.md                  # Deva — Altyapı ve operasyonlar
-│   ├── skills/                        # Yapılandırılmış iş akışları
-│   │   ├── project-context-primer/    # Oturum başlatma (zorunlu)
-│   │   ├── prompt-enhancer/           # İstek netleştirme
-│   │   ├── brainstorming/             # Sokratik tasarım rafinasyonu
-│   │   ├── writing-plans/             # İmplementasyon planlama
-│   │   ├── architecture-review/       # Plan stres testi
-│   │   ├── test-driven-execution/     # TDD iş akışı
-│   │   ├── code-review/               # Commit öncesi inceleme
-│   │   ├── github/                    # Git işlemleri ve commit'ler
-│   │   ├── knowledge-base-update/     # Kalıcı bellek
-│   │   ├── documentation-sync/        # Dokümantasyon senkronizasyonu
-│   │   ├── dependency-audit/          # Güvenlik taraması
-│   │   └── incident-response/         # Kriz yönetimi
-│   ├── rules/                         # Zorunlu standartlar
-│   │   ├── code-hygiene.md            # Temiz kod kuralları
-│   │   ├── code-quality.md            # DRY ve soyutlama kuralları
-│   │   └── safety.md                  # Yıkıcı işlem güvenlikleri
-│   └── knowledge/                     # Oturumlar arası bellek (otomatik doldurulur)
-├── .kilo/                             # Planlama çalışma alanı
+│   ├── agents/                        # Personas especialistas
+│   │   ├── designer.md                # Aria — UI/UX e design de movimento
+│   │   ├── frontend-dev.md            # Felix — Engenharia de frontend
+│   │   ├── backend-dev.md             # Bora — Backend e sistemas
+│   │   └── devops.md                  # Deva — Infraestrutura e operações
+│   ├── skills/                        # Fluxos de trabalho estruturados
+│   │   ├── project-context-primer/    # Início de sessão (obrigatório)
+│   │   ├── prompt-enhancer/           # Refinamento da solicitação
+│   │   ├── brainstorming/             # Refinamento de design socrático
+│   │   ├── writing-plans/             # Planejamento da implementação
+│   │   ├── architecture-review/       # Teste de estresse do plano
+│   │   ├── test-driven-execution/     # Fluxo de trabalho TDD
+│   │   ├── code-review/               # Revisão antes do commit
+│   │   ├── github/                    # Operações git e commits
+│   │   ├── knowledge-base-update/     # Memória persistente
+│   │   ├── documentation-sync/        # Sincronização da documentação
+│   │   ├── dependency-audit/          # Varredura de segurança
+│   │   └── incident-response/         # Gestão de crises
+│   ├── rules/                         # Padrões obrigatórios
+│   │   ├── code-hygiene.md            # Regras de código limpo
+│   │   ├── code-quality.md            # Regras de DRY e abstração
+│   │   └── safety.md                  # Proteções para operações destrutivas
+│   └── knowledge/                     # Memória entre sessões (preenchida automaticamente)
+├── .kilo/                             # Área de trabalho de planejamento
 │   └── plans/
 ├── LICENSE
 └── README.md
@@ -201,65 +201,65 @@ vibe-coder-kit/
 
 ---
 
-## 🔄 Geliştirme İş Akışı
+## 🔄 Fluxo de Trabalho
 
 ```
-🆕 YENİ OTURUM
-  └─ project-context-primer (zorunlu)
+🆕 NOVA SESSÃO
+  └─ project-context-primer (obrigatório)
 
-💡 FİKİR     → brainstorming → SCOPE-<slug>.md
-📋 PLAN      → writing-plans → implementation_plan.md → architecture-review
-🛠️ GELİŞTİR  → test-driven-execution
-✅ KOMİT     → code-review → github skill (conventional commits)
+💡 IDEIA     → brainstorming → SCOPE-<slug>.md
+📋 PLANO     → writing-plans → implementation_plan.md → architecture-review
+🛠️ DEV       → test-driven-execution
+✅ COMMIT    → code-review → github skill (conventional commits)
 ```
 
-<!-- Bu iş akışı öneridir. Projenizin ihtiyacına göre adımları atlayabilir veya özelleştirebilirsiniz. -->
+<!-- Este fluxo de trabalho é uma sugestão. Você pode pular ou customizar etapas conforme a necessidade do seu projeto. -->
 
-### Örnek Akış
+### Exemplo de Fluxo
 
-1. **Oturum başlat** → `project-context-primer` bağlamı yükler
-2. **Özelliği tanımla** → `brainstorming` bir scope dokümanı üretir
-3. **İmplementasyonu planla** → `writing-plans` checkpoint'li plan oluşturur
-4. **Mimariyi incele** → `architecture-review` planı stres testine tabi tutar
-5. **Geliştir** → `test-driven-execution` ile implementasyon yapılır
-6. **Kodu incele** → `code-review` pre-commit checklist çalıştırır
-7. **Commit ve push** → `github` skill conventional commits ve PR'ları yönetir
+1. **Iniciar a sessão** → `project-context-primer` carrega o contexto
+2. **Definir a funcionalidade** → `brainstorming` gera um documento de escopo
+3. **Planejar a implementação** → `writing-plans` cria um plano com checkpoints
+4. **Revisar a arquitetura** → `architecture-review` submete o plano a um teste de estresse
+5. **Desenvolver** → a implementação é feita com `test-driven-execution`
+6. **Revisar o código** → `code-review` executa o checklist pré-commit
+7. **Commit e push** → a skill `github` gerencia conventional commits e PRs
 
 ---
 
-## 🧠 Bilgi Kalıcılığı
+## 🧠 Persistência de Conhecimento
 
-En güçlü özelliklerden biri. Her önemli karar, tuzak, kural ve bug köken nedeni `.agent/knowledge/` dizininde saklanır ve oturum başlangıcında otomatik yüklenir:
+Um dos recursos mais poderosos. Toda decisão, armadilha, regra e causa raiz de bug importante é armazenada no diretório `.agent/knowledge/` e carregada automaticamente no início da sessão:
 
-| Tür | Ne Saklanır |
+| Tipo | O Que é Armazenado |
 |-----|-------------|
-| `decision` | Mimari seçimler, teknoloji tercihler ve gerekçeleri |
-| `convention` | İsimlendirme kuralları, kod pattern'leri, klasör yapıları |
-| `bug` | Belirsiz sorunların köken nedeni ve çözümü |
-| `gotcha` | 3. parti servis tuzakları, ortam sorunları, edge case'ler |
-| `research` | Önemli araştırma gerektiren soruların cevapları |
+| `decision` | Escolhas de arquitetura, preferências de tecnologia e suas justificativas |
+| `convention` | Regras de nomenclatura, padrões de código e estruturas de diretórios |
+| `bug` | Causa raiz de problemas ambíguos e sua solução |
+| `gotcha` | Armadilhas em serviços de terceiros, problemas de ambiente e casos extremos (edge cases) |
+| `research` | Respostas a perguntas que exigem pesquisa importante |
 
-<!-- Aynı sorunları her oturumda yeniden keşfetmek zorunda kalmazsınız. Bilgi birikir ve aktarılır. -->
+<!-- Você não precisa redescobrir os mesmos problemas a cada sessão. O conhecimento se acumula e é transmitido. -->
 
 ---
 
-## 🤝 Uyumluluk
+## 🤝 Compatibilidade
 
-**[OpenCode](https://opencode.ai)** için geliştirilmiştir, ancak kavramlar taşınabilir:
+Desenvolvido para o **[OpenCode](https://opencode.ai)**, mas os conceitos são portáveis:
 
-| Araç | Nasıl Kullanılır |
+| Ferramenta | Como Usar |
 |------|-----------------|
-| **OpenCode** | `opencode.json` + `AGENTS.md` ile doğal destek |
-| **Cursor** | Agent personalarını custom instructions olarak kullanın |
-| **Claude Code** | Skill dosyalarını `CLAUDE.md` içinde referans verin |
-| **GitHub Copilot** | Kuralları custom instructions'a uyarlayın |
-| **Windsurf** | Personaları agent yapılandırması olarak yükleyin |
+| **OpenCode** | `opencode.json` + `AGENTS.md` para suporte nativo |
+| **Cursor** | Use as personas de agente como custom instructions |
+| **Claude Code** | Referencie os arquivos de skill dentro do `CLAUDE.md` |
+| **GitHub Copilot** | Adapte as regras às custom instructions |
+| **Windsurf** | Carregue as personas como configuração de agente |
 
 ---
 
 ## 📋 Conventional Commits
 
-Bu kit [Conventional Commits](https://www.conventionalcommits.org/) standardını uygular:
+Este kit segue o padrão [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
 feat(auth): add refresh token rotation
@@ -269,81 +269,81 @@ docs(readme): update installation instructions
 chore(deps): upgrade react to 19.2.0
 ```
 
-<!-- Commit mesajları İngilizce yazılır, emir kipinde (imperative mood) olmalıdır. Detaylar için .agent/skills/github/SKILL.md dosyasına bakın. -->
+<!-- As mensagens de commit são escritas em inglês e devem estar no modo imperativo. Veja o arquivo .agent/skills/github/SKILL.md para mais detalhes. -->
 
 ---
 
-## 🌐 Dil Tercihi
+## 🌐 Idioma Preferido
 
-Tüm agent talimatları, kurallar ve skill dokümantasyonu **Türkçe** yazılmıştır. İngilizce frontmatter ile birlikte sunulur. Bu Türkçe konuşan geliştirme ekipleri için bilinçli bir tercihtir. Çeviri katkılarına açığız.
+Todas as instruções de agent, regras e a documentação das skills são escritas em **Português (Brasil)**, incluindo o frontmatter. Essa é uma escolha deliberada para equipes de desenvolvimento que falam português. Contribuições de tradução são bem-vindas.
 
 ---
 
-## 🤝 Katkıda Bulunmak
+## 🤝 Como Contribuir
 
-Katkılar memnuniyetle karşılanır! Mevcut yapıyı takip edin:
+Contribuições são muito bem-vindas! Siga a estrutura existente:
 
-1. Repo'yu fork edin
-2. Özellik branch'i oluşturun: `feat/yeni-ozellik`
-3. Mevcut skill/agent/rule yapısına uygun değişiklik yapın
-4. Pull request gönderin
+1. Faça um fork do repositório
+2. Crie um branch de funcionalidade: `feat/nova-funcionalidade`
+3. Faça alterações compatíveis com a estrutura existente de skills/agentes/regras
+4. Envie um pull request
 
-### Yeni Skill Eklemek
+### Adicionar uma Nova Skill
 
-`.agent/skills/skill-adi/SKILL.md` dosyası oluşturun:
+Crie o arquivo `.agent/skills/nome-da-skill/SKILL.md`:
 
 ```markdown
 ---
-name: skill-adi
+name: nome-da-skill
 description: >
-  Bu skill ne zaman kullanılır ve ne üretir.
+  Quando esta skill deve ser usada e o que ela produz.
 ---
 
-# Skill Adı
+# Nome da Skill
 
-## Ne Zaman Tetiklenir
-## Adım Adım Süreç
-## Kurallar
+## Quando é Acionada
+## Processo Passo a Passo
+## Regras
 ```
 
-### Yeni Agent Personalası Eklemek
+### Adicionar uma Nova Persona de Agente
 
-`.agent/agents/agent-adi.md` dosyası oluşturun:
+Crie o arquivo `.agent/agents/nome-do-agente.md`:
 
 ```markdown
-# Agent: Agent Adı
+# Agente: Nome do Agente
 
-## Kimlik
-## Uzmanlık Alanları
-## Çalışma Metodolojisi
-## Kod Standartları
-## Asla Yapma
-## Kullanılan Skill'ler
+## Identidade
+## Áreas de Especialização
+## Metodologia de Trabalho
+## Padrões de Código
+## Nunca Faça
+## Skills Utilizadas
 ```
 
 ---
 
-## 📄 Lisans
+## 📄 Licença
 
-Bu proje MIT Lisansı ile lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
+Este projeto está sob a Licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ---
 
-## 🌟 Destek
+## 🌟 Suporte
 
-Bu kit geliştirme iş akışınızı iyileştirdiyse:
+Se este kit melhorou o seu fluxo de trabalho de desenvolvimento:
 
-- ⭐ Bu repo'yu star'layın
-- 🐛 Sorunları bildirin (Issues sekmesi)
-- 💡 Yeni skill veya agent personalası önerin
-- 🔀 Pull request gönderin
+- ⭐ Dê uma star neste repositório
+- 🐛 Reporte problemas (aba Issues)
+- 💡 Sugira novas skills ou novas personas de agente
+- 🔀 Envie um pull request
 
 ---
 
 <div align="center">
 
-**⚡ ile geliştirildi by [omer gocmen](https://github.com/omergocmen)**
+**⚡ desenvolvido com [omer gocmen](https://github.com/omergocmen)**
 
-*Sadece çalışan değil — kalıcı yazılım geliştirin.*
+*Não apenas software que funciona — software que perdura.*
 
 </div>

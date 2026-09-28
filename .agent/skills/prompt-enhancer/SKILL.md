@@ -1,213 +1,217 @@
 <!--
-  TÜRKÇE AÇIKLAMA
+  DESCRIÇÃO
   ───────────────
-  Bu skill, belirsiz veya eksik bir kullanıcı isteğini alır ve onu daha net,
-  daha spesifik, daha uygulanabilir bir prompt'a dönüştürür. Agent'ın yanlış
-  anlayarak iş yapmasını önler. "Şunu düzelt" gibi muğlak bir istek,
-  "hangi koşulda ne bekleniyor, başarı kriteri ne" formatına çevrilir.
+  Esta skill recebe um pedido do usuário vago ou incompleto e o transforma em
+  um prompt mais claro, mais específico e mais aplicável. Evita que o agente
+  interprete errado e faça o trabalho de forma equivocada. Um pedido vago como
+  "conserte isso" é convertido no formato "em qual condição o que é esperado,
+  qual é o critério de sucesso".
 
-  NE ZAMAN: İstek belirsizse, kapsam netleşmemişse, birden fazla yorum mümkünse.
-            Diğer skilllerden önce çalıştırılır — girdi kalitesini artırır.
-  ÇIKTI:    Geliştirilmiş prompt metni — doğrudan brainstorming veya writing-plans'a gider.
+  QUANDO: Quando o pedido é vago, o escopo não está definido ou há mais de uma
+          interpretação possível. Executada antes das demais skills — melhora a
+          qualidade da entrada.
+  SAÍDA:   Texto do prompt aprimorado — segue direto para brainstorming ou
+           writing-plans.
 -->
 
 ---
 name: prompt-enhancer
 description: >
-  Takes a vague or incomplete user request and transforms it into a precise,
-  actionable prompt. Identifies missing dimensions (what, why, who, success criteria,
-  constraints) and either asks targeted questions or fills gaps with explicit assumptions.
-  Runs before other skills to improve input quality.
+  Recebe um pedido do usuário vago ou incompleto e o transforma em um prompt
+  preciso e acionável. Identifica as dimensões ausentes (o quê, por quê, quem,
+  critérios de sucesso, restrições) e faz perguntas direcionadas ou preenche as
+  lacunas com premissas explícitas. Executada antes das demais skills para
+  melhorar a qualidade da entrada.
 ---
 
-# Prompt Enhancer Skill
+# Skill de Aprimoramento de Prompts
 
-## Felsefe
+## Filosofia
 
-Yanlış soruya doğru cevap vermek, doğru soruya yanlış cevap vermekten daha kötüdür.
+Responder certo para a pergunta errada é pior do que responder errado para a pergunta certa.
 
-Bir isteğin kalitesi, çıktısının kalitesini belirler. Bu skill, agent'ın "galiba bunu kastetti" modunda çalışmasını engeller. Belirsizliği yüzeye çıkarır ve karar noktalarını netleştirir.
-
----
-
-## Ne Zaman Tetiklenir?
-
-Şu sinyallerden biri varsa bu skill devreye girer:
-
-- İstek tek cümle ve detaysız: *"Login'i düzelt"*, *"Performansı artır"*, *"Daha iyi görünsün"*
-- İstek birden fazla şekilde yorumlanabilir: *"Kullanıcı flow'unu iyileştir"*
-- Hedef kitle veya bağlam yok: *"Bir dashboard ekle"*
-- Başarı kriteri belirsiz: *"Hızlandır"*, *"Temizle"*, *"Optimize et"*
-- Kapsam sınırı yok: *"Auth sistemini yenile"*
+A qualidade de um pedido determina a qualidade da saída. Esta skill impede que o agente trabalhe no modo "provavelmente era isso que ele quis". Ela traz a ambiguidade para a superfície e esclarece os pontos de decisão.
 
 ---
 
-## Süreç
+## Quando é Disparado
 
-### Adım 1: İstek Türünü Tespit Et
+Esta skill entra em ação se houver qualquer um destes sinais:
 
-İlk olarak ne tür bir istek olduğunu belirle:
+- O pedido tem uma única frase e nenhum detalhe: *"Corrija o login"*, *"Aumente a performance"*, *"Quero que fique melhor"*
+- O pedido pode ser interpretado de várias formas: *"Melhore o fluxo do usuário"*
+- Não há público-alvo nem contexto: *"Adicione um dashboard"*
+- O critério de sucesso é vago: *"Acelere"*, *"Limpe"*, *"Otimize"*
+- Não há limite de escopo: *"Reformate o sistema de auth"*
 
-| Tür | Örnek | Eksik Boyutlar |
+---
+
+## Processo
+
+### Etapa 1: Identificar o Tipo de Pedido
+
+Primeiro, determine que tipo de pedido é:
+
+| Tipo | Exemplo | Dimensões Ausentes |
 |-----|-------|----------------|
-| **Bug fix** | "Login çalışmıyor" | Hangi koşulda? Hata mesajı? Her zaman mı? |
-| **Yeni özellik** | "Profil sayfası ekle" | Kim kullanacak? İçerik ne? Tasarım referansı? |
-| **Refactor** | "Kodu temizle" | Hangi dosya/modül? Temizden kasıt ne? |
-| **Performans** | "Hızlandır" | Hangi sayfa/endpoint? Hedef süre? Mevcut süre? |
-| **Tasarım** | "Daha güzel yap" | Referans var mı? Hangi element? Hangi bağlam? |
-| **Altyapı** | "Deploy otomatikleştir" | Hangi ortam? Mevcut pipeline? Tetikleyici ne? |
+| **Correção de bug** | "O login não funciona" | Em qual condição? Qual mensagem de erro? Sempre? |
+| **Nova funcionalidade** | "Adicionar página de perfil" | Quem vai usar? Qual conteúdo? Referência de design? |
+| **Refatoração** | "Limpe o código" | Qual arquivo/módulo? O que significa "limpo"? |
+| **Performance** | "Acelere" | Qual página/endpoint? Tempo alvo? Tempo atual? |
+| **Design** | "Deixe mais bonito" | Existe alguma referência? Qual elemento? Em qual contexto? |
+| **Infraestrutura** | "Automatizar o deploy" | Qual ambiente? Qual pipeline atual? Qual é o gatilho? |
 
 ---
 
-### Adım 2: Eksik Boyutları Bul
+### Etapa 2: Encontrar as Dimensões Ausentes
 
-Her istek için şu 6 boyutu kontrol et. Eksik olanları işaretle:
-
-```
-[ ] WHAT   — Tam olarak ne değişecek/eklenecek?
-[ ] WHY    — Neden gerekli? Hangi problemi çözüyor?
-[ ] WHO    — Kim kullanacak? Hangi kullanıcı/sistem?
-[ ] WHEN   — Deadline var mı? Hangi sırayla?
-[ ] HOW    — Kısıt var mı? (stack, platform, bütçe, mevcut API)
-[ ] DONE   — Başarı kriteri ne? "Bitti" ne zaman söylenecek?
-```
-
----
-
-### Adım 3: Geliştirme Stratejisini Seç
-
-**Strateji A — Sor** (1-2 kritik belirsizlik varsa):
-
-Sadece en önemli soruları sor. Her soruya neden sorulduğunu belirt:
+Para cada pedido, verifique estas 6 dimensões. Marque as que estiverem ausentes:
 
 ```
-Sana 2 sorum var — bunlara göre farklı yaklaşım seçeceğim:
-
-1. "Login çalışmıyor" derken — hangi koşulda?
-   a) Her zaman mı?
-   b) Belirli bir tarayıcıda mı?
-   c) Belirli bir kullanıcıda mı?
-   (Bu, bug'ın scope'unu belirliyor)
-
-2. Mevcut hata mesajı veya log var mı?
-   (Varsa paylaşırsan köken analizi çok daha hızlı olur)
-```
-
-**Strateji B — Varsay ve Göster** (3+ belirsizlik varsa, hızlı ilerleme öncelikli):
-
-Makul varsayımlar yap, bunları açıkça listele ve enhanced prompt'u üret:
-
-```
-İstek: "Profil sayfası ekle"
-
-Varsayımlar (onaylamanı bekliyorum):
-- Kullanıcı: giriş yapmış kayıtlı kullanıcılar
-- İçerik: isim, email, avatar, bio
-- Tasarım: mevcut design system'e uygun
-- Auth: JWT token ile korumalı route
-- Kapsam: frontend + backend endpoint
-
-Bu varsayımlardan farklı bir şey var mı? Yoksa bu scope ile başlayalım.
+[ ] WHAT   — O que exatamente vai mudar/ser adicionado?
+[ ] WHY    — Por que é necessário? Qual problema resolve?
+[ ] WHO    — Quem vai usar? Qual usuário/sistema?
+[ ] WHEN   — Existe deadline? Em qual ordem?
+[ ] HOW    — Existe alguma restrição? (stack, plataforma, orçamento, API existente)
+[ ] DONE   — Qual é o critério de sucesso? Quando será dito "terminou"?
 ```
 
 ---
 
-### Adım 4: Enhanced Prompt'u Üret
+### Etapa 3: Escolher a Estratégia de Aprofundamento
 
-Her iki stratejide de son çıktı format aşağıdaki gibi olur:
+**Estratégia A — Perguntar** (se houver 1-2 ambiguidades críticas):
+
+Faça apenas as perguntas mais importantes. Para cada pergunta, indique por que ela está sendo feita:
+
+```
+Tenho 2 perguntas — a resposta muda a abordagem que vou escolher:
+
+1. Ao dizer "o login não funciona" — em qual condição?
+   a) Sempre?
+   b) Em algum navegador específico?
+   c) Para um usuário específico?
+   (Isso define o escopo do bug)
+
+2. Existe alguma mensagem de erro ou log atual?
+   (Se você compartilhar, a análise de causa raiz fica muito mais rápida)
+```
+
+**Estratégia B — Assumir e Mostrar** (se houver 3+ ambiguidades, com prioridade em avançar rápido):
+
+Faça premissas razoáveis, liste-as claramente e produza o prompt aprimorado:
+
+```
+Pedido: "Adicionar página de perfil"
+
+Premissas (estou aguardando sua aprovação):
+- Usuário: usuários registrados que já fizeram login
+- Conteúdo: nome, email, avatar, bio
+- Design: alinhado ao design system existente
+- Auth: rota protegida com JWT token
+- Escopo: frontend + endpoint de backend
+
+Há algo diferente nessas premissas? Se não, vamos começar com este escopo.
+```
+
+---
+
+### Etapa 4: Produzir o Prompt Aprimorado
+
+Em ambas as estratégias, o formato da saída final é o seguinte:
 
 ```markdown
-## Enhanced Prompt
+## Prompt Aprimorado
 
-**Asıl İstek:** <kullanıcının orijinal isteği>
+**Pedido Original:** <pedido original do usuário>
 
-**Netleştirilmiş Görev:**
-<spesifik, tek yorumlu açıklama>
+**Tarefa Esclarecida:**
+<explicação específica, com interpretação única>
 
-**Kapsam İçi:**
-- <madde>
-- <madde>
+**Dentro do Escopo:**
+- <item>
+- <item>
 
-**Kapsam Dışı:**
-- <madde> (kapsam dışı bırakma gerekçesi)
+**Fora do Escopo:**
+- <item> (justificativa para deixar de fora)
 
-**Başarı Kriterleri:**
-1. <ölçülebilir kriter>
-2. <ölçülebilir kriter>
+**Critérios de Sucesso:**
+1. <critério mensurável>
+2. <critério mensurável>
 
-**Teknik Kısıtlar:**
-- <stack, platform, bağımlılık>
+**Restrições Técnicas:**
+- <stack, plataforma, dependência>
 
-**Açık Kalan Sorular:**
-- <varsa — bunlar ilerleyen aşamada cevaplanacak>
+**Perguntas que Restam Abertas:**
+- <se houver — serão respondidas na fase seguinte>
 
-**Önerilen Sonraki Skill:**
+**Próxima Skill Sugerida:**
 → <brainstorming | writing-plans | test-driven-execution>
 ```
 
 ---
 
-### Adım 5: Kullanıcıdan Onay Al
+### Etapa 5: Obter Aprovação do Usuário
 
-Enhanced prompt'u kullanıcıya göster:
+Mostre o prompt aprimorado ao usuário:
 
 ```
-Şu şekilde anladım — doğru mu?
+Entendi assim — está correto?
 
-[Enhanced Prompt içeriği]
+[Conteúdo do Prompt Aprimorado]
 
-Onaylıyorsan başlayabilirim. Değiştirmek istediğin bir şey var mı?
+Se você aprovar, posso começar. Há algo que queira mudar?
 ```
 
-Onay gelmeden bir sonraki skill'e geçilmez.
+Não avance para a próxima skill sem a aprovação.
 
 ---
 
-## Örnekler
+## Exemplos
 
-### Örnek 1: Bug Fix
+### Exemplo 1: Correção de Bug
 
-**Kullanıcı:** *"Şifre sıfırlama çalışmıyor"*
+**Usuário:** *"A redefinição de senha não funciona"*
 
-**Tespit:**
-- WHAT: şifre sıfırlama — ama hangi adımda?
-- HOW: hata mesajı yok
-- WHO: tüm kullanıcılar mı, belirli biri mi?
+**Diagnóstico:**
+- WHAT: redefinição de senha — mas em qual etapa?
+- HOW: sem mensagem de erro
+- WHO: todos os usuários ou apenas um específico?
 
-**Strateji A — Sor:**
+**Estratégia A — Perguntar:**
 ```
-"Şifre sıfırlama" akışının hangi adımında sorun var?
-  a) Email gönderilmiyor mu?
-  b) Link tıklanınca hata mı veriyor?
-  c) Yeni şifre kaydedilmiyor mu?
-```
-
----
-
-### Örnek 2: Performans
-
-**Kullanıcı:** *"Sayfa çok yavaş"*
-
-**Tespit:** 6 boyutun 5'i eksik.
-
-**Strateji B — Varsay ve Göster:**
-```
-Şu varsayımlarla devam edeyim:
-- Hangi sayfa: /dashboard (en çok kullanılan)
-- Mevcut durum: 4-5 saniye TTI (tahmin)
-- Hedef: 2 saniye altı
-- Platform: web (mobile değil)
-- Kısıt: mevcut stack değişmiyor
-
-Farklıysa söyle, yoksa Lighthouse profili çekerek başlayacağım.
+Em qual etapa do fluxo de "redefinição de senha" está o problema?
+  a) O email não está sendo enviado?
+  b) O link gera erro ao ser clicado?
+  c) A nova senha não está sendo salva?
 ```
 
 ---
 
-## Kurallar
+### Exemplo 2: Performance
 
-- **Her zaman onay al.** Enhanced prompt kullanıcı onayı olmadan uygulanmaz.
-- **Maksimum 3 soru sor.** Daha fazlası kullanıcıyı yorar — en kritik 3'ü seç.
-- **Varsayımları gizleme.** Her varsayım açıkça listelenir.
-- **Kapsam dışını da yaz.** "Bunu yapmıyorum çünkü" = en değerli netlik.
-- **Sonraki skill'i öner.** Enhanced prompt'tan sonra hangi skill çalışacak belirt.
+**Usuário:** *"A página está muito lenta"*
+
+**Diagnóstico:** 5 das 6 dimensões estão ausentes.
+
+**Estratégia B — Assumir e Mostrar:**
+```
+Vou seguir com estas premissas:
+- Qual página: /dashboard (a mais usada)
+- Situação atual: 4-5 segundos de TTI (estimativa)
+- Alvo: menos de 2 segundos
+- Plataforma: web (não mobile)
+- Restrição: o stack atual não muda
+
+Se estiver diferente, me avise; caso contrário, começo capturando o perfil do Lighthouse.
+```
+
+---
+
+## Regras
+
+- **Sempre obtenha aprovação.** O prompt aprimorado não é aplicado sem a aprovação do usuário.
+- **Faça no máximo 3 perguntas.** Mais do que isso cansa o usuário — escolha as 3 mais críticas.
+- **Não esconda as premissas.** Cada premissa é listada explicitamente.
+- **Escreva também o que está fora do escopo.** "Não estou fazendo isso porque" = a maior clareza possível.
+- **Sugira a próxima skill.** Informe qual skill vai rodar depois do prompt aprimorado.

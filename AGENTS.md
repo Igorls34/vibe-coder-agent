@@ -1,76 +1,76 @@
-# OpenCode Agent Setup
+# Configuração de Agent do OpenCode
 
-Bu dosya opencode tarafından her oturumda otomatik okunur.
-
----
-
-## Zorunlu İlk Adım
-
-Her yeni oturumda **`.agent/skills/project-context-primer/SKILL.md`** oku ve uygula. Bu atlanmaz.
+Este arquivo é lido automaticamente pelo OpenCode em todas as sessões.
 
 ---
 
-## Kritik Kurallar
+## Primeira Etapa Obrigatória
 
-### Güvenlik
-- `DROP`, `DELETE`, `TRUNCATE`, `rm -rf`, `git push --force` (ana branch): **Onay al before running**
-- Mevcut testler geçiyorsa ve görev o kodu doğrudan değiştirmiyorsa — **dokunma**
-- Migration/production deploy öncesi: **rollback adımı tanımla**
-
-### Kod Temizliği
-- Yorumlar sadece fonksiyon/metot başlıklarında
-- `console.log`, `console.warn`, `debugger`, `print()`: commit öncesi **kaldır**
-- Hassas değerler (API key, token): **.env kullan**, kesinlikle koda yazma
-- Yeni env variable eklendiğinde: **.env.example güncelle** (açıklama zorunlu)
-
-### Kod Kalitesi
-- Aynı kod 3+ yerde tekrar ediyorsa → **extract et**
-- Yeni soyutlama öncesi: "3+ yerde kullanılıyor mu? 6 ay sonra anlaşılır mı?" → Hayır ise **bırak**
-- Refactor: feature commit'inden ayrı, bağımsız commit
+Em cada nova sessão, leia e aplique **`.agent/skills/project-context-primer/SKILL.md`**. Isso não pode ser pulado.
 
 ---
 
-## İş Akışı
+## Regras Críticas
+
+### Segurança
+- `DROP`, `DELETE`, `TRUNCATE`, `rm -rf`, `git push --force` (branch principal): **Peça aprovação antes de executar**
+- Se os testes atuais estão passando e a tarefa não exige mudar esse código diretamente — **não mexa**
+- Antes de migration/production deploy: **defina a etapa de rollback**
+
+### Limpeza de Código
+- Comentários apenas no início de funções/métodos
+- `console.log`, `console.warn`, `debugger`, `print()`: **remova** antes do commit
+- Valores sensíveis (API key, token): **use .env**, nunca escreva no código
+- Ao adicionar uma nova variável de ambiente: **atualize o .env.example** (descrição obrigatória)
+
+### Qualidade de Código
+- Se o mesmo código se repete em 3+ lugares → **extraia**
+- Antes de criar uma nova abstração: "Está sendo usado em 3+ lugares? Vai ser compreensível daqui a 6 meses?" → Se a resposta for não, **deixe como está**
+- Refactor: commit separado do commit da feature, commit independente
+
+---
+
+## Fluxo de Trabalho
 
 ```
-YENİ OTURUM
-  └─ project-context-primer (zorunlu)
+NOVA SESSÃO
+  └─ project-context-primer (obrigatório)
 
-FİKİR     → brainstorming → SCOPE-<slug>.md
-PLAN      → writing-plans → implementation_plan.md → architecture-review
-GELİŞTİRME → test-driven-execution
-KOMİT     → github skill (doğrudan git komutu ÇALISTIRMA)
+IDEIA      → brainstorming → SCOPE-<slug>.md
+PLANO      → writing-plans → implementation_plan.md → architecture-review
+DEV        → test-driven-execution
+COMMIT     → github skill (não EXECUTE comando git diretamente)
            → code-review → conventional commit → PR
 ```
 
 ---
 
-## Skill & Agent Yapısı
+## Estrutura de Skills e Agentes
 
-**.agent/** dizini:
-- `skills/` — süreç tanımları (her biri SKILL.md ile)
-- `agents/` — uzman persona tanımları
-- `rules/` — zorunlu kurallar (code-hygiene, code-quality, safety)
-- `knowledge/` — konuşmalar arası kalıcı bilgi
+Diretório **.agent/**:
+- `skills/` — definições de processo (cada uma com um SKILL.md)
+- `agents/` — definições de personas de especialista
+- `rules/` — regras obrigatórias (code-hygiene, code-quality, safety)
+- `knowledge/` — conhecimento persistente entre conversas
 
-**Temel skill dosyaları:**
+**Skills principais:**
 
-| Skill | Ne Zaman |
+| Skill | Quando Usar |
 |-------|----------|
-| `project-context-primer` | Her oturum başında — zorunlu |
-| `github` | Tüm git işlemlerinde |
-| `code-review` | Commit öncesi |
-| `brainstorming` | Fikir/gereksinim netleştirilirken |
-| `writing-plans` | Scope onaylandıktan sonra |
-| `knowledge-base-update` | Öğrenilen her şeyde |
+| `project-context-primer` | No início de cada sessão — obrigatório |
+| `github` | Em todas as operações git |
+| `code-review` | Antes do commit |
+| `brainstorming` | Ao esclarecer ideia/requisito |
+| `writing-plans` | Depois que o escopo for aprovado |
+| `knowledge-base-update` | A cada coisa aprendida |
 
-**Agent personaları:** Aria (UI/UX), Felix (Frontend), Bora (Backend), Deva (DevOps)
+**Personas de agentes:** Aria (UI/UX), Felix (Frontend), Bora (Backend), Deva (DevOps)
 
 ---
 
-## Kritik Davranış
+## Comportamento Crítico
 
-- **Belirsizlikte sor** — varsayım yapma
-- **Kapsamı sessizce genişletme** — görev dışı sorun görürsen bildir
-- **"Çalışıyor" ≠ "bitti"** — testler geçiyor + temiz kod + docs güncel
-- **5+ dosya etkileniyorsa** — önce plan göster, onay al
+- **Na dúvida, pergunte** — não faça premissas
+- **Não amplie o escopo silenciosamente** — se encontrar um problema fora da tarefa, comunique
+- **"Funciona" ≠ "Está pronto"** — testes passando + código limpo + docs atualizados
+- **Se afetarem 5+ arquivos** — mostre o plano primeiro e peça aprovação

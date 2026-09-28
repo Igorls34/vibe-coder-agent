@@ -1,119 +1,123 @@
 ---
 name: knowledge-base-update
 description: >
-  Use this skill whenever you learn something important during a conversation:
-  a key architectural decision, a project-specific convention, a bug root-cause,
-  a 3rd-party API quirk, or any fact that would help a future agent avoid
-  re-doing the same research. Writes structured entries to the project's
-  knowledge base so that context persists across conversations and agents.
+  Use esta skill sempre que aprender algo importante durante uma conversa: uma
+  decisão arquitetural chave, uma convenção específica do projeto, a causa raiz
+  de um bug, uma peculiaridade de uma API de terceiros, ou qualquer fato que
+  ajude um agente futuro a não refazer a mesma pesquisa. Escreve entradas
+  estruturadas na base de conhecimento do projeto para que o contexto persista
+  entre conversas e agentes.
 ---
 
 <!--
-  TÜRKÇE AÇIKLAMA
+  DESCRIÇÃO
   ───────────────
-  Bu skill, konuşma sırasında öğrenilen önemli bilgilerin kaybolmaması için kullanılır.
-  Mimari kararlar, proje kuralları, bug köken nedenleri, 3. parti servis tuzakları veya
-  tekrar araştırılmasını istemediğin her şeyi yapılandırılmış biçimde .agent/knowledge/
-  dizinine yazar. Böylece gelecekteki agent'lar aynı soruyu sıfırdan araştırmak zorunda kalmaz.
+  Esta skill é usada para que as informações importantes aprendidas durante uma
+  conversa não se percam. Decisões de arquitetura, regras do projeto, causas raiz
+  de bugs, armadilhas de serviços de terceiros e qualquer coisa que você não
+  quer que precise ser pesquisada novamente são escritas de forma estruturada no
+  diretório .agent/knowledge/. Assim, os agentes futuros não precisam pesquisar a
+  mesma pergunta do zero.
 
-  NE ZAMAN: Önemli bir karar alındığında, sürpriz bir bug çözüldüğünde,
-            bir API davranışı belgelendiğinde, yeni bir proje kuralı oluşturulduğunda.
-  ÇIKTI:    .agent/knowledge/<slug>.md + INDEX.md satırı
+  QUANDO: Quando uma decisão importante é tomada, quando um bug surpreendente
+          é resolvido, quando o comportamento de uma API é documentado, quando
+          uma nova regra de projeto é criada.
+  SAÍDA:   .agent/knowledge/<slug>.md + uma linha no INDEX.md
 -->
 
-# Knowledge Base Update Skill
+# Skill de Atualização da Base de Conhecimento
 
-## When to Trigger
+## Quando é Disparado
 
-Activate this skill when any of the following occur:
+Ative esta skill quando ocorrer qualquer um dos casos abaixo:
 
-- An architectural or tech-stack decision is made (and the *why* matters)
-- A non-obvious bug is fixed (root cause + fix documented)
-- A 3rd-party service/API has a quirk, limit, or gotcha discovered
-- A project convention is established (naming, folder structure, patterns)
-- A research question is answered after significant investigation
-- A "we tried X and it failed because Y" moment happens
+- Uma decisão arquitetural ou de stack de tecnologia é tomada (e o *porquê* importa)
+- Um bug não óbvio é corrigido (causa raiz + correção documentadas)
+- Uma peculiaridade, limite ou armadilha de um serviço/API de terceiros é descoberta
+- Uma convenção de projeto é estabelecida (nomenclatura, estrutura de pastas, padrões)
+- Uma pergunta de pesquisa é respondida após uma investigação significativa
+- Acontece um momento do tipo "tentamos X e falhou por causa de Y"
 
-## Step-by-Step Process
+## Processo Passo a Passo
 
-### 1. Identify the Entry Type
+### 1. Identifique o Tipo da Entrada
 
-Choose the category that best describes what was learned:
+Escolha a categoria que melhor descreve o que foi aprendido:
 
-| Type | When to Use |
-|------|------------|
-| `decision` | Architecture, tech choices, trade-offs |
-| `convention` | Naming rules, code patterns, folder structures |
-| `bug` | Root cause + fix for a non-obvious problem |
-| `gotcha` | 3rd-party quirk, env issue, edge case trap |
-| `research` | Answer to a question requiring significant investigation |
+| Tipo | Quando Usar |
+|------|-------------|
+| `decision` | Arquitetura, escolhas de tecnologia, trade-offs |
+| `convention` | Regras de nomenclatura, padrões de código, estruturas de pastas |
+| `bug` | Causa raiz + correção de um problema não óbvio |
+| `gotcha` | Peculiaridade de terceiros, problema de ambiente, armadilha de edge case |
+| `research` | Resposta a uma pergunta que exigiu investigação significativa |
 
-### 2. Determine the File Path
+### 2. Defina o Caminho do Arquivo
 
-Write to: `.agent/knowledge/<slug>.md`
+Escreva em: `.agent/knowledge/<slug>.md`
 
-- `slug` = kebab-case summary of the topic (e.g., `auth-token-refresh-strategy`)
-- If an entry for this topic already exists, **update it** rather than creating a new file
-- Group related topics under subfolders: `.agent/knowledge/auth/`, `.agent/knowledge/infra/`, etc.
+- `slug` = resumo do tópico em kebab-case (ex.: `auth-token-refresh-strategy`)
+- Se já existir uma entrada para este tópico, **atualize-a** em vez de criar um arquivo novo
+- Agrupe tópicos relacionados em subpastas: `.agent/knowledge/auth/`, `.agent/knowledge/infra/`, etc.
 
-### 3. Write the Entry
+### 3. Escreva a Entrada
 
-Use this exact template:
+Use exatamente este modelo:
 
 ```markdown
 ---
 type: <decision|convention|bug|gotcha|research>
-topic: <Short human-readable title>
+topic: <título curto legível por humanos>
 date: <YYYY-MM-DD>
 tags: [<tag1>, <tag2>]
 ---
 
-## Summary
-<One or two sentences — what was learned, bottom line up front>
+## Resumo
+<Uma ou duas frases — o que foi aprendido, a conclusão primeiro>
 
-## Context
-<Why this came up. What problem were we solving?>
+## Contexto
+<Por que isso apareceu. Que problema estávamos resolvendo?>
 
-## Decision / Finding
-<The actual content. Be specific. Include code snippets if helpful.>
+## Decisão / Descoberta
+<O conteúdo real. Seja específico. Inclua trechos de código, se ajudar.>
 
-## Rationale
-<Why this choice over alternatives. What alternatives were rejected and why.>
+## Justificativa
+<Por que esta escolha em vez das alternativas. Quais alternativas foram rejeitadas e por quê.>
 
-## Consequences
-<What does this affect going forward? What to watch out for?>
+## Consequências
+(O que isso afeta daqui para frente? No que é preciso ficar atento?>
 
-## References
-- <File path, PR link, conversation snippet, or external URL>
+## Referências
+- <Caminho de arquivo, link de PR, trecho de conversa ou URL externa>
 ```
 
-### 4. Update the Index
+### 4. Atualize o Índice
 
-After writing the entry, append a one-line summary to `.agent/knowledge/INDEX.md`:
+Após escrever a entrada, acrescente um resumo de uma linha em `.agent/knowledge/INDEX.md`:
 
 ```
-| <date> | <type> | [<topic>](./<path>.md) | <one-line summary> |
+| <date> | <type> | [<topic>](./<path>.md) | <resumo de uma linha> |
 ```
 
-If `INDEX.md` doesn't exist yet, create it with this header first:
+Se o `INDEX.md` ainda não existir, crie-o com este cabeçalho primeiro:
 
 ```markdown
-# Project Knowledge Base
+# Base de Conhecimento do Projeto
 
-| Date | Type | Topic | Summary |
-|------|------|-------|---------|
+| Data | Tipo | Tópico | Resumo |
+|------|-----|--------|--------|
 ```
 
-### 5. Confirm to User
+### 5. Confirme ao Usuário
 
-After writing, report:
-- What was saved and where
-- The one-line summary that was added to the index
+Após escrever, relate:
+- O que foi salvo e onde
+- O resumo de uma linha que foi adicionado ao índice
 
-## Rules
+## Regras
 
-- **Never summarize vaguely.** "We decided to use X" is useless without *why*.
-- **Include the anti-pattern.** If something was tried and rejected, document it — that's often the most valuable knowledge.
-- **Keep entries atomic.** One topic per file. Don't bundle unrelated decisions.
-- **Date is mandatory.** Future agents need to know how fresh this knowledge is.
-- **If in doubt, write it.** The cost of a redundant entry is low. The cost of a missing one is re-doing the work.
+- **Nunca resuma de forma vaga.** "Decidimos usar X" não serve de nada sem o *porquê*.
+- **Inclua o anti-pattern.** Se algo foi testado e rejeitado, documente — costuma ser o conhecimento mais valioso.
+- **Mantenha as entradas atômicas.** Um tópico por arquivo. Não agrupe decisões sem relação.
+- **A data é obrigatória.** Agentes futuros precisam saber quão recente é esse conhecimento.
+- **Na dúvida, escreva.** O custo de uma entrada redundante é baixo. O custo de uma ausente é refazer o trabalho.

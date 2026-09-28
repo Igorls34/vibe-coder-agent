@@ -1,38 +1,41 @@
 ---
 name: dependency-audit
 description: >
-  Periodically scan project dependencies for security vulnerabilities,
-  outdated packages, and unused dependencies. Produces a prioritized
-  action report. Run before every major release and at least once per month.
+  Verifica periodicamente as dependências do projeto em busca de vulnerabilidades
+  de segurança, pacotes desatualizados e dependências não utilizadas. Produz um
+  relatório de ações priorizado. Execute antes de cada release importante e pelo
+  menos uma vez por mês.
 ---
 
 <!--
-  TÜRKÇE AÇIKLAMA
+  DESCRIÇÃO
   ───────────────
-  Bu skill, projenin bağımlılıklarını (npm, pip, vb.) güvenlik açıkları, eski sürümler
-  ve kullanılmayan paketler açısından tarar. Bulunan sorunları öncelik sırasına göre
-  listeler ve güvenli güncellemeleri otomatik uygular. Her major release öncesi ve
-  ayda bir çalıştırılmalıdır.
+  Esta skill varre as dependências do projeto (npm, pip, etc.) em busca de
+  vulnerabilidades de segurança, versões antigas e pacotes não utilizados. Lista
+  os problemas encontrados por ordem de prioridade e aplica automaticamente
+  atualizações seguras. Deve ser executada antes de cada release importante e
+  uma vez por mês.
 
-  NE ZAMAN: Her production release öncesi. Aylık rutin. Yeni CVE duyurulduğunda.
-  ÇIKTI:    .agent/audits/dependency-audit-YYYY-MM-DD.md — öncelikli aksiyon raporu.
+  QUANDO: Antes de cada release de produção. Rotina mensal. Quando um novo CVE
+          for anunciado.
+  SAÍDA:   .agent/audits/dependency-audit-YYYY-MM-DD.md — relatório de ações priorizado.
 -->
 
-# Dependency Audit Skill
+# Skill de Auditoria de Dependências
 
-## When to Trigger
+## Quando é Disparado
 
-- Before any production release
-- Monthly cadence (add to sprint planning)
-- After a CVE is publicly announced that might affect your stack
-- When a team member says "we should update our packages"
-- Before onboarding a new contributor (known-safe baseline)
+- Antes de qualquer release de produção
+- Na cadência mensal (incluir no planejamento do sprint)
+- Depois que um CVE for anunciado publicamente e puder afetar sua stack
+- Quando alguém do time diz "devemos atualizar nossos pacotes"
+- Antes de integrar um novo contribuidor (baseline conhecido como seguro)
 
-## Step-by-Step Process
+## Processo Passo a Passo
 
-### 1. Detect Package Ecosystem
+### 1. Detecte o Ecossistema de Pacotes
 
-Identify which package managers are in use:
+Identifique quais gerenciadores de pacotes estão em uso:
 
 ```
 package.json        → npm / yarn / pnpm  (Node.js)
@@ -43,18 +46,18 @@ go.mod              → go modules         (Go)
 Cargo.toml          → cargo              (Rust)
 ```
 
-Run the audit steps for each ecosystem found.
+Execute as etapas de auditoria para cada ecossistema encontrado.
 
 ---
 
-### 2. Security Vulnerability Scan
+### 2. Varredura de Vulnerabilidades de Segurança
 
 #### Node.js
 ```bash
 npm audit
-# or
+# ou
 yarn audit
-# or
+# ou
 pnpm audit
 ```
 
@@ -64,25 +67,25 @@ pip install pip-audit
 pip-audit
 ```
 
-#### General (all ecosystems)
+#### Geral (todos os ecossistemas)
 ```bash
-# If using GitHub: check Security tab → Dependabot alerts
-# If using Snyk:
+# Se estiver usando GitHub: verifique a aba Security → alertas do Dependabot
+# Se estiver usando Snyk:
 snyk test
 ```
 
-**Triage each finding:**
+**Faça a triagem de cada achado:**
 
-| Severity | Action |
-|----------|--------|
-| Critical | Fix immediately before any other work |
-| High | Fix before next release |
-| Medium | Schedule for current sprint |
-| Low | Track, fix when touching related code |
+| Severidade | Ação |
+|------------|------|
+| Crítica | Corrija imediatamente, antes de qualquer outra coisa |
+| Alta | Corrija antes do próximo release |
+| Média | Agende para o sprint atual |
+| Baixa | Acompanhe e corrija quando mexer no código relacionado |
 
 ---
 
-### 3. Outdated Package Scan
+### 3. Varredura de Pacotes Desatualizados
 
 #### Node.js
 ```bash
@@ -94,14 +97,14 @@ npm outdated
 pip list --outdated
 ```
 
-For each outdated package, check:
-1. **How many major versions behind?** (1 minor = low urgency, 2+ major = high urgency)
-2. **Is it a direct or transitive dependency?**
-3. **Does the changelog mention breaking changes?**
+Para cada pacote desatualizado, verifique:
+1. **Quantas versões majors está atrás?** (1 minor = baixa urgência, 2+ major = alta urgência)
+2. **É uma dependência direta ou transitiva?**
+3. **O changelog menciona breaking changes?**
 
 ---
 
-### 4. Unused Dependency Detection
+### 4. Detecção de Dependências Não Utilizadas
 
 #### Node.js
 ```bash
@@ -114,16 +117,16 @@ pip install deptry
 deptry .
 ```
 
-For each unused dependency flagged:
-- Verify it's truly unused (some are peer deps or used at runtime via config)
-- If confirmed unused, remove from `package.json` / `requirements.txt`
-- Re-run the app and tests to confirm nothing breaks
+Para cada dependência não utilizada sinalizada:
+- Verifique se ela realmente não é usada (algumas são peer deps ou são usadas em runtime via config)
+- Se confirmar que não é usada, remova do `package.json` / `requirements.txt`
+- Reexecute a aplicação e os testes para confirmar que nada quebrou
 
 ---
 
-### 5. License Compliance Check
+### 5. Verificação de Conformidade de Licenças
 
-Flag any dependencies with licenses that may be incompatible with your project:
+Sinalize quaisquer dependências cujas licenças possam ser incompatíveis com seu projeto:
 
 ```bash
 # Node.js
@@ -134,85 +137,85 @@ pip install pip-licenses
 pip-licenses
 ```
 
-**License risk tiers:**
+**Níveis de risco de licença:**
 
-| License | Risk |
-|---------|------|
-| MIT, Apache 2.0, BSD | Safe for most uses |
-| LGPL | Generally OK, check linking requirements |
-| GPL | Risk if distributing proprietary software |
-| AGPL | High risk — requires open-sourcing if used via network |
-| Unknown | Must investigate before use |
+| Licença | Risco |
+|---------|-------|
+| MIT, Apache 2.0, BSD | Seguro para a maioria dos usos |
+| LGPL | Geralmente ok, verifique os requisitos de linking |
+| GPL | Risco se você distribui software proprietário |
+| AGPL | Risco alto — exige open source se usado via rede |
+| Desconhecida | Precisa ser investigada antes do uso |
 
 ---
 
-### 6. Produce the Audit Report
+### 6. Produza o Relatório de Auditoria
 
-Write findings to `.agent/audits/dependency-audit-<YYYY-MM-DD>.md`:
+Escreva os achados em `.agent/audits/dependency-audit-<YYYY-MM-DD>.md`:
 
 ```markdown
-# Dependency Audit — <YYYY-MM-DD>
+# Auditoria de Dependências — <YYYY-MM-DD>
 
-## Summary
-- **Critical vulnerabilities:** <N>
-- **High vulnerabilities:** <N>
-- **Outdated packages:** <N>
-- **Unused packages:** <N>
-- **License issues:** <N>
+## Resumo
+- **Vulnerabilidades críticas:** <N>
+- **Vulnerabilidades altas:** <N>
+- **Pacotes desatualizados:** <N>
+- **Pacotes não utilizados:** <N>
+- **Problemas de licença:** <N>
 
-## Critical / High — Action Required
+## Críticas / Altas — Ação Obrigatória
 
 ### <package-name> @ <version>
 - **CVE:** CVE-XXXX-XXXXX
-- **Severity:** Critical
-- **Description:** <what the vulnerability is>
-- **Fix:** Upgrade to <version>
-- **Breaking changes:** Yes/No — <details>
+- **Severidade:** Crítica
+- **Descrição:** <o que é a vulnerabilidade>
+- **Correção:** Atualizar para <version>
+- **Breaking changes:** Sim/Não — <detalhes>
 
-## Outdated Packages
+## Pacotes Desatualizados
 
-| Package | Current | Latest | Urgency | Notes |
-|---------|---------|--------|---------|-------|
-| express | 4.17.1 | 5.0.0 | High | Major version — review changelog |
-| lodash | 4.17.20 | 4.17.21 | Low | Patch only |
+| Pacote | Atual | Mais Recente | Urgência | Observações |
+|--------|-------|--------------|----------|-------------|
+| express | 4.17.1 | 5.0.0 | Alta | Versão major — revisar o changelog |
+| lodash | 4.17.20 | 4.17.21 | Baixa | Apenas patch |
 
-## Unused Dependencies (safe to remove)
-- `left-pad` — not imported anywhere
-- `moment` — replaced by `date-fns` but not removed
+## Dependências Não Utilizadas (seguras para remover)
+- `left-pad` — não é importado em lugar nenhum
+- `moment` — substituído por `date-fns` mas não removido
 
-## License Issues
-- `<package>` uses GPL-3.0 — review with team before next release
+## Problemas de Licença
+- `<package>` usa GPL-3.0 — revisar com o time antes do próximo release
 
-## Recommendations
-1. <prioritized action>
-2. <prioritized action>
+## Recomendações
+1. <ação priorizada>
+2. <ação priorizada>
 ```
 
 ---
 
-### 7. Execute Safe Fixes
+### 7. Execute as Correções Seguras
 
-For packages with **patch or minor** updates and **no breaking changes**:
+Para pacotes com atualizações de **patch ou minor** e **sem breaking changes**:
 
 ```bash
-# Node.js — safe updates only
+# Node.js — apenas atualizações seguras
 npm update
 
 # Python
 pip install --upgrade <package>
 ```
 
-After upgrading:
-1. Run the full test suite
-2. Do a smoke test of the running app
-3. Commit with message: `chore: dependency security updates <YYYY-MM-DD>`
+Após atualizar:
+1. Execute a suíte de testes completa
+2. Faça um smoke test da aplicação em execução
+3. Faça o commit com a mensagem: `chore: dependency security updates <YYYY-MM-DD>`
 
-For **major version** upgrades, create a separate branch and task.
+Para atualizações de **versão major**, crie uma branch e uma tarefa separadas.
 
-## Rules
+## Regras
 
-- **Never auto-upgrade major versions** in bulk — do them one at a time.
-- **Always run tests after any upgrade** — even patch versions can break things.
-- **Keep the audit report** even after fixes — it's a compliance record.
-- **Critical vulnerabilities block releases** — no exceptions without explicit sign-off.
-- **Unused packages must be removed**, not just ignored — they are attack surface.
+- **Nunca atualize versões major em massa automaticamente** — faça uma de cada vez.
+- **Sempre rode os testes após qualquer atualização** — até uma versão patch pode quebrar algo.
+- **Guarde o relatório de auditoria** mesmo depois das correções — ele é um registro de conformidade.
+- **Vulnerabilidades críticas bloqueiam releases** — sem exceções, a não ser que haja um aval explícito.
+- **Pacotes não utilizados devem ser removidos**, não apenas ignorados — eles são superfície de ataque.

@@ -1,190 +1,195 @@
 ---
 name: code-review
 description: >
-  Systematic code review skill covering both requesting a review (pre-commit checklist)
-  and receiving and responding to review feedback. Checks code quality, security,
-  test coverage, architectural alignment, and documentation before any code is committed.
+  Skill de revisão de código que cobre tanto solicitar uma revisão (checklist
+  antes do commit) quanto receber e responder a feedbacks de revisão. Verifica
+  qualidade de código, segurança, cobertura de testes, alinhamento arquitetural
+  e documentação antes de qualquer commit.
 ---
 
 <!--
-  TÜRKÇE AÇIKLAMA
+  DESCRIÇÃO
   ───────────────
-  Bu skill, yazılan kodun commit'lenmeden veya push'lanmadan önce sistematik
-  biçimde incelenmesini sağlar. Hem "review isteği hazırlama" (requesting) hem de
-  "review feedback'ini yanıtlama" (receiving) süreçlerini kapsar.
-  Kod kalitesi, güvenlik, test coverage, mimari uyum ve dokümantasyon kontrol edilir.
+  Esta skill garante que o código escrito seja revisado de forma sistemática
+  antes de ser commitado ou enviado (push). Cobre tanto o processo de
+  "preparar uma solicitação de revisão" (requesting) quanto o de
+  "responder ao feedback de revisão" (receiving).
+  São verificados qualidade de código, segurança, cobertura de testes,
+  alinhamento com a arquitetura e documentação.
 
-  NE ZAMAN: Commit öncesi (kendi kendine review), PR açmadan önce, büyük değişikliklerde.
-  ÇIKTI:    Review checklist raporu, yanıtlanmış feedback listesi, düzeltilmiş kod.
+  QUANDO: Antes do commit (auto-revisão), antes de abrir um PR, em mudanças grandes.
+  SAÍDA:   Relatório de checklist de revisão, lista de feedbacks respondidos, código corrigido.
 -->
 
 
-# Code Review Skill
+# Skill de Revisão de Código
 
-## İki Mod
+## Dois Modos
 
-Bu skill iki farklı durumda devreye girer:
+Esta skill é acionada em duas situações diferentes:
 
-| Mod | Ne Zaman | Ne Yapar |
-|-----|----------|----------|
-| **A — Pre-Commit Review** | Commit öncesi, kendi kendinle | Checklist çalıştır, commit'e hazır mı karar ver |
-| **B — Feedback Response** | Başkası review yaptı, feedback geldi | Her yorumu sınıflandır, yanıtla, düzelt |
+| Modo | Quando | O que Faz |
+|-----|--------|-----------|
+| **A — Pre-Commit Review** | Antes do commit, revisando o próprio trabalho | Rode o checklist e decida se está pronto para o commit |
+| **B — Feedback Response** | Alguém fez uma revisão e chegou feedback | Classifique cada comentário, responda e corrija |
 
 ---
 
-## MOD A: Pre-Commit Review (Kendi Kendine)
+## MODO A: Pre-Commit Review (Auto-revisão)
 
-### 1. Diff'i Çek ve Analiz Et
+### 1. Obtenha e analise o diff
 
 ```bash
-git diff HEAD          # staged olmayan değişiklikler
-git diff --staged      # staged değişiklikler
-git diff main...HEAD   # branch'in tüm değişiklikleri
+git diff HEAD          # alterações não staged
+git diff --staged      # alterações staged
+git diff main...HEAD   # todas as alterações da branch
 ```
 
-Her değişen dosyayı gözden geçir. PR'da yorum almak istemediğin şeyleri şimdi düzelt.
+Revise cada arquivo alterado. Corrija agora tudo que você não quer receber
+comentário sobre no PR.
 
 ---
 
-### 2. Checklist — Sırayla Uygula
+### 2. Checklist — siga em ordem
 
-#### 🔴 Kritik (bunlar varsa commit yok)
+#### 🔴 Crítico (se houver algum, não faça commit)
 
-- [ ] Hardcoded secret, API key, password var mı?
+- [ ] Há segredo hardcoded, API key ou senha?
   ```bash
   git grep -i "password\|secret\|api_key\|token" -- '*.ts' '*.js' '*.py' '*.env'
   ```
-- [ ] SQL injection vektörü var mı? (raw query + user input)
-- [ ] Authentication veya authorization bypass riski var mı?
-- [ ] Testler geçiyor mu?
+- [ ] Há vetor de SQL injection? (raw query + input do usuário)
+- [ ] Há risco de bypass de autenticação ou autorização?
+- [ ] Os testes estão passando?
   ```bash
   npm test
   ```
-- [ ] Build kırılıyor mu?
+- [ ] O build está quebrado?
   ```bash
   npm run build
   ```
-- [ ] Başka modülleri kıran breaking change var mı? (notify et)
+- [ ] Há breaking change que quebra outros módulos? (avise)
 
-#### 🟡 Önemli (bunlar varsa ya düzelt ya bilinçli geç)
+#### 🟡 Importante (se houver, corrija ou pule conscientemente com motivo)
 
-- [ ] Yeni public fonksiyon/endpoint'in JSDoc veya tipi var mı?
-- [ ] Hata yönetimi yapıldı mı? (try-catch, error boundary, 404/500 handling)
-- [ ] Konsola debug log bırakıldı mı? (`console.log`, `print`, `debugger`)
-- [ ] Yeni env variable varsa `.env.example`'a eklendi mi?
-- [ ] Herhangi bir TODO veya FIXME bırakıldı mı? (bilinçliyse ticket numarası ekle)
-- [ ] Code coverage düştü mü?
+- [ ] A nova função/endpoint pública tem JSDoc ou tipagem?
+- [ ] O tratamento de erros foi feito? (try-catch, error boundary, tratamento de 404/500)
+- [ ] Sobrou algum debug log no console? (`console.log`, `print`, `debugger`)
+- [ ] Se foi criada uma nova env variable, ela foi adicionada ao `.env.example`?
+- [ ] Sobrou algum TODO ou FIXME? (se proposital, adicione o número da ticket)
+- [ ] A cobertura de código caiu?
   ```bash
   npm test -- --coverage
   ```
-- [ ] Yeni bağımlılık eklendiyse güvenlik kontrolü yapıldı mı?
+- [ ] Se foi adicionada uma nova dependência, a verificação de segurança foi feita?
   ```bash
   npm audit
   ```
 
-#### 🔵 Kalite (mükemmel kod için)
+#### 🔵 Qualidade (para código excelente)
 
-- [ ] Fonksiyon isimleri ne yaptıklarını anlatıyor mu?
-- [ ] Bir fonksiyon birden fazla şey yapıyor mu? (bölmeli)
-- [ ] Kod kopyalandı mı? (copy-paste → extract to function)
-- [ ] Magic number veya string var mı? (constant'a extract et)
-- [ ] Tip kullanımı yeterince katı mı? (`any` var mı?)
+- [ ] Os nomes das funções dizem o que elas fazem?
+- [ ] Uma função está fazendo mais de uma coisa? (deveria ser dividida)
+- [ ] Houve cópia de código? (copy-paste → extrair para uma função)
+- [ ] Há magic number ou magic string? (extrair para uma constante)
+- [ ] O uso de tipos é estrito o suficiente? (existe algum `any`?)
 
 ---
 
-### 3. Review Kartı Oluştur
+### 3. Crie o Card de Revisão
 
-Commit mesajının yanına veya PR açıklamasına eklemek için:
+Para anexar à mensagem de commit ou à descrição do PR:
 
 ```markdown
-## Self-Review Özeti
+## Resumo da Auto-revisão
 
-**Değişiklik:** <ne yaptım, neden>
-**Test Durumu:** ✅ Tüm testler geçiyor / ⚠️ X test skip edildi (gerekçe: ...)
+**Mudança:** <o que eu fiz, por quê>
+**Status dos Testes:** ✅ Todos os testes passando / ⚠️ X testes ignorados (justificativa: ...)
 **Checklist:**
-  - 🔴 Kritik: Temiz
-  - 🟡 Önemli: [varsa not]
-  - 🔵 Kalite: [varsa not]
+  - 🔴 Crítico: Limpo
+  - 🟡 Importante: [observação, se houver]
+  - 🔵 Qualidade: [observação, se houver]
 
-**Özellikle dikkat çekilmek istenen:**
-- <reviewer'ın bakmasını istediğin yer>
+**Pontos em que gostaria de atenção especial:**
+- <local que você quer que o revisor olhe>
 
-**Bilinçli atlanan kısayollar (deliberate shortcuts):**
-- <varsa gerekçesiyle>
+**Atalhos deliberadamente ignorados (deliberate shortcuts):**
+- <com a justificativa, se houver>
 ```
 
 ---
 
-## MOD B: Feedback Response (Başkasının Review'ı)
+## MODO B: Feedback Response (Revisão de Outra Pessoa)
 
-### 1. Her Yorumu Sınıflandır
+### 1. Classifique Cada Comentário
 
-Gelen her review yorumu için:
+Para cada comentário de revisão recebido:
 
 ```
-[KRITIK]  → Blokerlik eder, merge edilemez — hemen düzelt
-[ÖNEMLI]  → Güçlü öneri, iyi gerekçen yoksa uygula
-[ÖNERI]   → Takdire bağlı, açık tartışma gerekebilir
-[SORU]    → Bilgi isteği — açıkla veya kod ile düzelt
-[NIT]     → Küçük stil/isimlendirme, senin tercihine bağlı
+[CRÍTICO]  → Bloqueia o merge, não é mergeável — corrija imediatamente
+[IMPORT.]  → Sugestão forte, aplique se a justificativa for boa
+[SUGESTÃO] → Elogio, pode exigir discussão aberta
+[PERGUNTA] → Pedido de informação — explique ou corrija no código
+[NIT]      → Detalhe de estilo/nomenclatura, depende da sua preferência
 ```
 
-### 2. Her Yorumu Yanıtla
+### 2. Responda Cada Comentário
 
-**Hiçbir yorum cevapsız bırakılmaz.**
+**Nenhum comentário fica sem resposta.**
 
 ```markdown
-Yorum: "Bu fonksiyonun timeout'u yok, servis yanıt vermezse ne olur?"
-→ Sınıf: [KRİTİK]
-→ Cevap: "Haklısın. 5 saniyelik timeout + retry ekledim. T3 commit'inde görebilirsin."
-→ Aksiyon: Düzeltildi ✅
+Comentário: "Esta função não tem timeout, o que acontece se o serviço não responder?"
+→ Classe: [CRÍTICO]
+→ Resposta: "Você tem razão. Adicionei timeout de 5 segundos + retry. Você pode ver no commit T3."
+→ Ação: Corrigido ✅
 
-Yorum: "Belki burada Map yerine Set kullanabilirsin"
-→ Sınıf: [ÖNERİ]
-→ Cevap: "Set burada doğru olur, key'e ihtiyacımız yok. Değiştirdim."
-→ Aksiyon: Düzeltildi ✅
+Comentário: "Talvez aqui você possa usar Set em vez de Map"
+→ Classe: [SUGESTÃO]
+→ Resposta: "Set realmente faz sentido aqui, não precisamos de key. Mudei."
+→ Ação: Corrigido ✅
 
-Yorum: "Bu isimlendirme bana semantik gelmiyor"
-→ Sınıf: [NIT]
-→ Cevap: "Anladım mantığını ama `processUserData` yerine `normalizeUserInput` daha açıklayıcı — değiştirdim."
-→ Aksiyon: Düzeltildi ✅
+Comentário: "Essa nomenclatura não me parece semântica"
+→ Classe: [NIT]
+→ Resposta: "Entendi a lógica, mas `normalizeUserInput` é mais descritivo que `processUserData` — mudei."
+→ Ação: Corrigido ✅
 ```
 
-### 3. Düzeltmeleri Grupla ve Commit At
+### 3. Agrupe as Correções e Faça os Commits
 
-Her düzeltme grubunu ayrı bir commit olarak at (`github` skill commit standardına göre):
+Envie cada grupo de correção como um commit separado (conforme o padrão de
+commit da skill `github`):
 
 ```bash
-# Her düzeltme ayrı commit
+# Cada correção é um commit
 git commit -m "fix: add timeout and retry to userService.fetchProfile"
 git commit -m "refactor: use Set instead of Map in deduplication logic"
 git commit -m "refactor: rename processUserData to normalizeUserInput"
 ```
 
-### 4. Re-Review İste
+### 4. Solicite a Re-revisão
 
-Tüm düzeltmeler tamamlandığında review'ı güncelle:
+Quando todas as correções estiverem concluídas, atualize a revisão:
 
 ```markdown
-## Düzeltme Özeti
+## Resumo das Correções
 
-Toplam yorum: 8
-- Düzeltildi: 7
-- Reddedildi (gerekçeyle): 1 → "NIT yorumu: mevcut isimlendirme proje konvansiyonuyla uyumlu"
+Total de comentários: 8
+- Corrigidos: 7
+- Rejeitados (com justificativa): 1 → "Comentário NIT: a nomenclatura atual está alinhada à convenção do projeto"
 
-Önemli değişiklikler:
-- Timeout + retry mekanizması eklendi (güvenlik açısından kritik)
-- 2 refactor (netlik için)
+Mudanças relevantes:
+- Mecanismo de timeout + retry adicionado (crítico do ponto de vista de segurança)
+- 2 refatorações (por clareza)
 
-Re-review için hazır.
+Pronto para re-revisão.
 ```
 
 ---
 
-## Kurallar
+## Regras
 
-- **Kırmızı item varsa commit yok.** İstisna yok.
-- **"Sonra düzeltilir" yasak.** Ya şimdi düzelt ya da ticket aç, ticket numarasını koda ekle.
-- **Her review yorumu yanıtlanır.** "Tamam" veya sessizlik kabul edilmez — ya "düzelttim" ya "katılmıyorum, çünkü..."
-- **Review kendini kandırmak için değil, kodu korumak için.** Checklist'i hızlıca geçiştirme.
-- **Gelen feedback kişisel değil.** Yorum koda yapılıyor, sana değil.
+- **Com item vermelho não há commit.** Sem exceções.
+- **"Depois eu corrijo" é proibido.** Ou corrija agora, ou abra uma ticket e adicione o número dela no código.
+- **Todo comentário de revisão é respondido.** "OK" ou silêncio não são aceitos — ou "corrigi", ou "não concordo, porque...".
+- **A revisão existe para proteger o código, não para se enganar.** Não passe o checklist às pressas.
+- **O feedback recebido não é pessoal.** O comentário é sobre o código, não sobre você.

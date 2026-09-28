@@ -1,77 +1,78 @@
 <!--
-  TÜRKÇE AÇIKLAMA
+  DESCRIÇÃO
   ───────────────
-  Sistemin zarar görmesini engelleyen kurallar.
-  Geri dönülemez komutlar için onay zorunluluğu ve
-  çalışan sisteme dokunmama prensibi bu dosyada tanımlıdır.
-  Bu kurallar her görevde, istisnasız uygulanır.
+  Regras que evitam danos ao sistema.
+  A obrigatoriedade de aprovação para comandos irreversíveis e
+  o princípio de não mexer em sistemas funcionando estão definidos neste arquivo.
+  Essas regras são aplicadas em todas as tarefas, sem exceção.
 -->
 
 ---
 name: safety
 description: >
-  Prevents irreversible damage to systems and data.
-  Destructive commands require explicit user approval.
-  Working systems must not be touched unless the task directly requires it.
+  Impede danos irreversíveis em sistemas e dados.
+  Comandos destrutivos exigem aprovação explícita do usuário.
+  Sistemas em funcionamento não devem ser alterados, a menos que a tarefa
+  exija isso diretamente.
 ---
 
-# Safety Rules
+# Regras de Segurança
 
-## 1. Yıkıcı Komut Onayı
+## 1. Aprovação de Comandos Destrutivos
 
-Aşağıdaki pattern'lerden herhangi birini içeren komutlar **çalıştırılmadan önce kullanıcıya gösterilir** ve onay beklenir:
+Comandos que contenham qualquer um dos patterns abaixo são **exibidos ao usuário antes de serem executados** e aguardam aprovação:
 
 ```
 DROP TABLE      DROP DATABASE     DROP INDEX
 DELETE FROM     TRUNCATE
 rm -rf          rmdir /s
-git push --force (ana branch'te)
+git push --force (na branch principal)
 kubectl delete
 docker system prune
 ```
 
-**Gösterim formatı:**
+**Formato de exibição:**
 ```
-⚠️  Yıkıcı komut tespit edildi — onay gerekiyor:
+⚠️  Comando destrutivo detectado — aprovação necessária:
 
   rm -rf ./dist
 
-Bu işlem geri alınamaz. Devam etmeli miyim? (evet/hayır)
+Esta operação não pode ser desfeita. Devo continuar? (sim/não)
 ```
 
-Kullanıcı "evet" demeden komut çalıştırılmaz. "Ufak değişiklik" veya "geçici" istisnası yoktur.
+O comando não é executado até que o usuário responda "sim". Não existe exceção para "mudança pequena" ou "temporário".
 
 ---
 
-## 2. Çalışan Sisteme Dokunma
+## 2. Não Mexer em Sistemas em Funcionamento
 
-Eğer bir sistem şu anda çalışıyorsa (test geçiyor, production'da aktif, kullanıcı tarafından kullanılıyor):
+Se um sistema está funcionando no momento (testes passando, ativo em production, em uso pelo usuário):
 
-- Görev o sistemi **doğrudan değiştirmeyi** gerektirmiyorsa → **dokunma**
-- Yeni özellik eklerken mevcut çalışan kodu kırmak zorundaysan → önce kullanıcıya bildir ve alternatif öner
+- Se a tarefa não exige **mudar esse sistema diretamente** → **não mexa**
+- Se, ao adicionar uma nova funcionalidade, você precisar quebrar o código que está funcionando → avise o usuário antes e proponha uma alternativa
 
-**Pratik kural:**
+**Regra prática:**
 ```
-Yeni şey eklenince mevcut testler kırılıyorsa → dur ve bildir.
-"Bunu düzeltmek için şunu yapmam gerekiyor" de, sessizce değiştirme.
+Ao adicionar algo novo, se os testes existentes quebrarem → pare e avise.
+Em vez de mudar em silêncio, diga: "Para corrigir isso, preciso fazer o seguinte".
 ```
 
-Yeni bir özellik eklendiğinde şu sıra uygulanır:
-1. Mevcut testleri çalıştır — yeşil mi? → başla
-2. Değişiklik sonrası testleri tekrar çalıştır
-3. Kırılan test varsa → önce bunu raporla, sonra düzelt
+Ao adicionar uma nova funcionalidade, siga esta ordem:
+1. Execute os testes existentes — estão verdes? → comece
+2. Execute os testes novamente após a alteração
+3. Se algum teste quebrar → reporte isso primeiro e só então corrija
 
 ---
 
-## 3. Rollback Planı Zorunluluğu
+## 3. Obrigatoriedade do Plano de Rollback
 
-Aşağıdaki işlemlerden önce rollback adımı tanımlanır:
+Antes das operações abaixo, a etapa de rollback é definida:
 
-| İşlem | Rollback |
+| Operação | Rollback |
 |-------|---------|
-| Database migration | Down migration yazılmış ve test edilmiş |
-| Production deploy | Önceki versiyon tag'i mevcut, deploy geri alınabilir |
-| Config değişikliği | Eski değer yorum olarak veya `.env.example`'da saklı |
-| Büyük refactor | Feature branch'te yapılır, main'e dokunulmaz |
+| Database migration | Down migration escrita e testada |
+| Production deploy | O tag da versão anterior existe, é possível reverter o deploy |
+| Alteração de config | Valor antigo guardado como comentário ou no `.env.example` |
+| Refactor grande | Feito em uma feature branch, sem mexer na main |
 
-Rollback tanımlanmadan yıkıcı işleme başlanmaz.
+Nenhuma operação destrutiva começa antes de o rollback estar definido.

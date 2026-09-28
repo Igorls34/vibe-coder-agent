@@ -1,103 +1,105 @@
 <!--
-  TÜRKÇE AÇIKLAMA
+  DESCRIÇÃO
   ───────────────
-  Kodun temiz ve bakımı kolay kalmasını sağlayan kurallar.
-  Yorum stili, debug log temizliği ve hassas veri yönetimi
-  bu dosyada tanımlanmıştır. Her commit öncesi kontrol edilir.
+  Regras que mantêm o código limpo e fácil de manter.
+  O estilo de comentário, a limpeza de logs de debug e o tratamento
+  de variáveis de ambiente e dados sensíveis estão definidos neste arquivo.
+  Tudo é verificado antes de cada commit.
 -->
 
 ---
 name: code-hygiene
 description: >
-  Keeps code clean and maintainable. Defines comment style (method-level only),
-  debug log cleanup policy, and environment variable / sensitive data handling.
+  Mantém o código limpo e sustentável. Define o estilo de comentário (somente no
+  nível de método), a política de limpeza de logs de debug e o tratamento de
+  variáveis de ambiente e dados sensíveis.
 ---
 
-# Code Hygiene Rules
+# Regras de Higiene de Código
 
-## 1. Yorum Stili — Yalnızca Metot Seviyesinde
+## 1. Estilo de Comentário — Somente no Nível de Método
 
-Kod içine **satır arası yorum yazılmaz.** Yorumlar yalnızca fonksiyon/metot başlıklarında bulunur.
+**Não se escreve comentário no meio do código.** Os comentários existem apenas no início de funções/métodos.
 
 ```typescript
-// ✅ Doğru — metot üstünde, ne yaptığını açıklayan JSDoc
+// ✅ Correto — JSDoc acima do método, explicando o que ele faz
 /**
- * Kullanıcıyı email ile bulur, bulamazsa null döner.
+ * Encontra o usuário pelo email e retorna null se não encontrar.
  */
 async function findUserByEmail(email: string): Promise<User | null> {
   return db.users.findUnique({ where: { email } });
 }
 
-// ❌ Yanlış — satır içi açıklama
+// ❌ Errado — comentário inline
 async function findUserByEmail(email: string) {
-  // email'i küçük harfe çevir
+  // converte o email para minúsculas
   const normalized = email.toLowerCase();
-  // veritabanında ara
+  // procura no banco de dados
   return db.users.findUnique({ where: { email: normalized } });
 }
 ```
 
-**Kural:** Bir satırı açıklamak zorunda hissediyorsan, kod yeterince açık değildir. Yorumu sil, kodu düzelt.
+**Regra:** Se você sente a necessidade de explicar uma linha, o código não está claro o suficiente. Apague o comentário e corrija o código.
 
-İstisnalar (tek kabul edilen):
-- `// TODO: #123 — açıklaması` (ticket numarası zorunlu)
-- `// FIXME: #456 — nedeni` (ticket numarası zorunlu)
+Exceções (as únicas aceitas):
+- `// TODO: #123 — descrição` (o número do ticket é obrigatório)
+- `// FIXME: #456 — motivo` (o número do ticket é obrigatório)
 
 ---
 
-## 2. Debug Log Temizliği
+## 2. Limpeza de Logs de Debug
 
-Görev tamamlandıktan sonra, commit öncesinde şunlar kaldırılır:
+Depois de concluir a tarefa e antes do commit, remova:
 
-| Dil | Temizlenecekler |
+| Linguagem | O que remover |
 |-----|----------------|
 | JavaScript/TypeScript | `console.log`, `console.warn`, `console.error`, `console.table`, `debugger` |
-| Python | `print()` (loglama için değil debug için kullanılanlar) |
-| CSS/HTML | Geçici `outline: 1px solid red` veya test renkleri |
+| Python | `print()` (os usados para debug, não para logging) |
+| CSS/HTML | `outline: 1px solid red` temporário ou cores de teste |
 
-**Kontrol komutu:**
+**Comando de verificação:**
 ```bash
-# Commit öncesi — staged dosyalarda debug log var mı?
+# Antes do commit — há logs de debug nos arquivos em staging?
 git diff --staged | grep -E "console\.(log|warn|error|table)|debugger|print\("
 ```
 
-Gerçek loglama (`logger.info`, `logger.error`) bu kuralın kapsamı dışındadır — bunlar kalır.
+O logging real (`logger.info`, `logger.error`) está fora do escopo desta regra — eles permanecem.
 
 ---
 
-## 3. Environment Variable & Hassas Veri Yönetimi
+## 3. Variáveis de Ambiente & Dados Sensíveis
 
-### 3a. Görünür Değer Yasağı
-API key, token, şifre, connection string — bunların hiçbiri kod içinde görünmez:
+### 3a. Proibido Valor Visível
+API key, token, senha, connection string — nenhum deles aparece no código:
 
 ```typescript
-// ❌ Yasak
+// ❌ Proibido
 const apiKey = "sk-1234abcd...";
 const dbUrl = "postgresql://user:pass@host/db";
 
-// ✅ Doğru
+// ✅ Correto
 const apiKey = process.env.OPENAI_API_KEY;
 const dbUrl = process.env.DATABASE_URL;
 ```
 
-### 3b. API'den Alınabilecek Değerler
-Eğer bir değer runtime'da API'den çekilebiliyorsa → kod içine sabit yazılan değer yerine API'den al:
+### 3b. Valores que Podem Vir da API
+Se um valor puder ser obtido da API em runtime → busque da API em vez de escrever um valor fixo no código:
 
 ```typescript
-// ❌ Yanlış — config'i koda göm
-const maxUploadSize = 10 * 1024 * 1024; // hardcoded 10MB
+// ❌ Errado — embute a config no código
+const maxUploadSize = 10 * 1024 * 1024; // 10MB definido no código (hardcoded)
 
-// ✅ Doğru — config endpoint varsa oradan al
+// ✅ Correto — se existir um endpoint de config, busque de lá
 const { maxUploadSize } = await configService.getAppConfig();
 ```
 
-### 3c. Yeni ENV Variable → .env.example Zorunlu
-Her yeni environment variable eklendiğinde `.env.example` güncellenir:
+### 3c. Nova Variável de Ambiente → .env.example é Obrigatório
+Sempre que uma nova variável de ambiente for adicionada, o `.env.example` é atualizado:
 
 ```bash
 # .env.example
-OPENAI_API_KEY=your-key-here          # OpenAI API anahtarı
-DATABASE_URL=postgresql://...          # Veritabanı bağlantı URL'i
+OPENAI_API_KEY=your-key-here          # Chave da API da OpenAI
+DATABASE_URL=postgresql://...          # URL de conexão com o banco de dados
 ```
 
-Açıklama satırı (# ile başlayan) zorunludur. Değer örnek/placeholder olmalı, gerçek değer asla girilmez.
+A linha de descrição (começando com #) é obrigatória. O valor deve ser um exemplo/placeholder — nunca insira um valor real.

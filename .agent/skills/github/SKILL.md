@@ -1,65 +1,67 @@
 ---
 name: github
 description: >
-  Manages all git operations (commit, push, branch management, PR creation)
-  in a standardized, safe, and consistent way. Automatically runs the code-review
-  skill before any commit. Enforces Conventional Commits standard. Handles the
-  full lifecycle: branch → review → commit → push → PR.
+  Gerencia todas as operações git (commit, push, gestão de branches, criação de
+  PRs) de forma padronizada, segura e consistente. Executa automaticamente a
+  skill code-review antes de qualquer commit. Impõe o padrão Conventional Commits.
+  Cobre o ciclo completo: branch → revisão → commit → push → PR.
 ---
 
 <!--
-  TÜRKÇE AÇIKLAMA
+  DESCRIÇÃO
   ───────────────
-  Bu skill, tüm git işlemlerini (commit, push, branch yönetimi, PR oluşturma)
-  standart, güvenli ve tutarlı biçimde yönetir. Commit öncesi otomatik olarak
-  `code-review` skill'ini çalıştırır. Conventional Commits standardını uygular.
-  "Çalışıyor, attım" yerine "incelendi, standarda uygun, dokümante edildi, atıldı" der.
+  Esta skill gerencia todas as operações git (commit, push, gestão de branches,
+  criação de PRs) de forma padronizada, segura e consistente. Executa
+  automaticamente a skill `code-review` antes do commit. Impõe o padrão
+  Conventional Commits. Em vez de "está funcionando, enviei", diz
+  "revisado, dentro do padrão, documentado, enviado".
 
-  NE ZAMAN: Herhangi bir git işlemi yapılacağında — commit, push, branch oluşturma,
-            PR açma, tag. Bu skill atlanarak doğrudan git komutu çalıştırılmaz.
-  ÇIKTI:    Clean commit history, PR açıklaması, güncellenmiş CHANGELOG.
+  QUANDO: Sempre que for executar uma operação git — commit, push, criação de
+          branch, abertura de PR, tag. Nenhum comando git é executado
+          diretamente, pulando esta skill.
+  SAÍDA:   Histórico de commits limpo, descrição do PR, CHANGELOG atualizado.
 -->
 
 
-# GitHub Skill
+# Skill de GitHub
 
-## Temel Kural
+## Regra Principal
 
-**Hiçbir commit `code-review` skill çalıştırılmadan atılmaz.**  
-Bu kural ihlal edilemez. "Küçük değişiklik" veya "sadece bir satır" istisnası yoktur.
+**Nenhum commit é enviado sem executar a skill `code-review`.**  
+Essa regra não pode ser violada. Não existe exceção para "mudança pequena" ou "só uma linha".
 
 ---
 
-## Commit Standardı — Conventional Commits
+## Padrão de Commit — Conventional Commits
 
-### Format
+### Formato
 
 ```
 <type>(<scope>): <subject>
 
-[body — opsiyonel]
+[body — opcional]
 
-[footer — opsiyonel]
+[footer — opcional]
 ```
 
-### Type Listesi
+### Lista de Tipos
 
-| Type | Ne Zaman Kullanılır |
-|------|-------------------|
-| `feat` | Yeni özellik |
-| `fix` | Bug düzeltmesi |
-| `refactor` | Davranış değişmeden kod düzenlemesi |
-| `style` | Formatlama, boşluk (işlevsel değişiklik yok) |
-| `test` | Test ekleme veya düzenleme |
-| `docs` | Dokümantasyon değişikliği |
-| `chore` | Build, dependency, config güncellemesi |
-| `perf` | Performans iyileştirmesi |
-| `ci` | CI/CD pipeline değişikliği |
-| `revert` | Önceki commit'i geri alma |
+| Tipo | Quando Usar |
+|------|-------------|
+| `feat` | Nova funcionalidade |
+| `fix` | Correção de bug |
+| `refactor` | Reorganização de código sem mudança de comportamento |
+| `style` | Formatação, espaços (sem mudança funcional) |
+| `test` | Adição ou ajuste de testes |
+| `docs` | Mudança de documentação |
+| `chore` | Atualização de build, dependências, config |
+| `perf` | Melhoria de performance |
+| `ci` | Mudança no pipeline de CI/CD |
+| `revert` | Reverter um commit anterior |
 
-### Scope (Opsiyonel ama Önerilir)
+### Escopo (Opcional, mas Recomendado)
 
-Etkilenen modül, komponent veya katman:
+Módulo, componente ou camada afetado:
 ```
 feat(auth): add refresh token rotation
 fix(userService): handle null email in validation
@@ -67,22 +69,22 @@ refactor(Button): extract loading state to hook
 chore(deps): upgrade react to 19.2.0
 ```
 
-### Subject Kuralları
+### Regras de Subject
 
-- **İmperative mood** kullan (Türkçe: emir kipi): "add" not "added", "fix" not "fixed"
-- **Küçük harf** ile başla
-- **Nokta ile bitirme**
-- **72 karakter** sınırı
-- **Ne** değiştiğini yaz, **neden** body'de açıkla
+- **Use o modo imperativo**: "add" e não "added", "fix" e não "fixed"
+- **Comece em minúscula**
+- **Não termine com ponto**
+- **Limite de 72 caracteres**
+- **Diga o que** mudou; explique **por que** no body
 
-### Body (Neden Değişti?)
+### Body (Por Que Mudou?)
 
 ```
 feat(auth): add refresh token rotation
 
-Statik refresh token'lar çalınırsa süresiz erişim sağlar.
-Rotation ile her kullanımda yeni token üretilir, eskisi geçersiz kılınır.
-RFC 6749 güvenlik önerisi doğrultusunda implement edildi.
+Se um refresh token estático for roubado, ele dá acesso indeterminado.
+Com rotation, um novo token é gerado a cada uso e o anterior é invalidado.
+Implementado conforme a recomendação de segurança da RFC 6749.
 ```
 
 ### Breaking Change
@@ -90,77 +92,77 @@ RFC 6749 güvenlik önerisi doğrultusunda implement edildi.
 ```
 feat(api)!: change user ID format from integer to UUID
 
-BREAKING CHANGE: Tüm /api/users/:id endpoint'leri artık UUID string
-bekliyor. Integer ID kullanan client'lar güncellenmeli.
+BREAKING CHANGE: todos os endpoints /api/users/:id agora esperam uma string UUID.
+Clientes que usam ID inteiro precisam ser atualizados.
 
 Migration guide: docs/migrations/integer-to-uuid.md
 ```
 
 ---
 
-## Tam İş Akışı
+## Fluxo de Trabalho Completo
 
-### 1. Branch Oluştur
+### 1. Criar a Branch
 
 ```bash
-# Format: <type>/<kısa-açıklama>
+# Formato: <type>/<descrição-curta>
 git checkout -b feat/user-registration
 git checkout -b fix/token-refresh-null-check
 git checkout -b refactor/button-loading-state
 ```
 
-Branch isimlendirme kuralları:
-- Lowercase, kebab-case
-- Type ile başlar (`feat/`, `fix/`, `refactor/`, `hotfix/`)
-- `main` veya `master`'a direkt commit atılmaz
+Regras de nomenclatura de branch:
+- Minúsculas, kebab-case
+- Começa com o tipo (`feat/`, `fix/`, `refactor/`, `hotfix/`)
+- Nunca faça commit direto em `main` ou `master`
 
 ---
 
-### 2. Code Review Çalıştır
+### 2. Executar o Code Review
 
-Commit atmadan önce **`code-review` skill'ini aç ve MOD A'yı uygula**.
+Antes de fazer o commit, **abra a skill `code-review` e aplique o MODO A**.
 
 ```bash
-# Önce ne değiştiğini kontrol et
+# Primeiro verifique o que mudou
 git status
 git diff --staged
 ```
 
-Code review checklist tamamlanmadan 3. adıma geçilmez.
+Não se avança para o passo 3 sem concluir o checklist de code review.
 
 ---
 
-### 3. Stage ve Commit
+### 3. Stage e Commit
 
 ```bash
-# İlgili dosyaları stage'e al — hepsini değil, mantıklı gruplar halinde
+# Adicione ao stage os arquivos relevantes — não tudo, em grupos coerentes
 git add src/services/userService.ts src/services/userService.test.ts
 
-# Commit at — standarda göre
+# Faça o commit — conforme o padrão
 git commit -m "feat(userService): add createUser with password hashing
 
-Yeni kullanıcı kaydı için service katmanı eklendi.
-bcrypt ile password hash'leniyor (saltRounds: 12).
-Duplicate email durumunda DuplicateEmailError fırlatılıyor.
+Adicionada a camada de service para o cadastro de novo usuário.
+A senha é hasheada com bcrypt (saltRounds: 12).
+Em caso de e-mail duplicado, é lançado o DuplicateEmailError.
 
-Testler: userService.test.ts — 8 test, hepsi geçiyor"
+Testes: userService.test.ts — 8 testes, todos passando"
 ```
 
-**Atomik commit'ler:**
-- Bir commit, bir mantıksal değişiklik
-- Migration + model + service = 3 ayrı commit
-- "misc fixes" veya "wip" commit'leri yasak
+**Commits atômicos:**
+- Um commit, uma mudança lógica
+- Migration + model + service = 3 commits separados
+- Commits "misc fixes" ou "wip" são proibidos
 
 ---
 
-### 4. Her Commit Sonrası Kontrol
+### 4. Verificação Após Cada Commit
 
 ```bash
-git log --oneline -5    # Son commit'lere bak
-git show HEAD           # Son commit'in diff'ini kontrol et
+git log --oneline -5    # Veja os últimos commits
+git show HEAD           # Confira o diff do último commit
 ```
 
-Commit mesajı yanlışsa hemen düzelt (push öncesinde):
+Se a mensagem de commit estiver errada, corrija imediatamente (antes do push):
 ```bash
 git commit --amend -m "fix(auth): handle null refresh token in rotation"
 ```
@@ -170,60 +172,60 @@ git commit --amend -m "fix(auth): handle null refresh token in rotation"
 ### 5. Push
 
 ```bash
-# İlk push — upstream set et
+# Primeiro push — defina o upstream
 git push -u origin feat/user-registration
 
-# Sonraki push'lar
+# Pushes seguintes
 git push
 ```
 
-**Push öncesi:**
+**Antes do push:**
 ```bash
-# Testler son kez çalıştırılır
+# Os testes são executados uma última vez
 npm test
 
-# Main'den geride mi? Rebase et
+# Está atrás da main? Faça rebase
 git fetch origin
 git rebase origin/main
 ```
 
 ---
 
-### 6. Pull Request Oluştur
+### 6. Criar o Pull Request
 
-GitHub CLI ile (PR şablonu inline — `.github/PR_TEMPLATE.md` yoksa aşağıdakini kullan):
+Com o GitHub CLI (template de PR inline — se `.github/PR_TEMPLATE.md` não existir, use o abaixo):
 
 ```bash
 gh pr create \
   --title "feat(auth): user registration with email verification" \
   --base main \
   --label "feature" \
-  --body "## Ne Değişti?
-<2-3 cümle: ne yapıldı, neden>
+  --body "## O que mudou?
+<2-3 frases: o que foi feito, por quê>
 
-## Nasıl Test Edildi?
-- [ ] Unit testler: \`npm test\` — X/X geçiyor
-- [ ] Integration test: manuel doğrulandı
-- [ ] Edge case'ler test edildi
+## Como foi testado?
+- [ ] Testes unitários: \`npm test\` — X/X passando
+- [ ] Teste de integração: validado manualmente
+- [ ] Edge cases foram testados
 
 ## Checklist
-- [ ] Code review (MOD A) tamamlandı
-- [ ] Testler geçiyor
-- [ ] Breaking change varsa CHANGELOG güncellendi
-- [ ] Yeni env variable varsa \`.env.example\`'a eklendi
-- [ ] \`documentation-sync\` skill çalıştırıldı (API değişikliği varsa)
+- [ ] Code review (MODO A) concluído
+- [ ] Testes passando
+- [ ] CHANGELOG atualizado, se houver BREAKING CHANGE
+- [ ] `.env.example` atualizado, se houver nova env variable
+- [ ] Skill \`documentation-sync\` executada (se houve mudança de API)
 
-## İlgili
-- Closes #İSSUE_NUMARASI"
+## Relacionados
+- Closes #NÚMERO_DA_ISSUE"
 ```
 
-> **Not:** Ekip `.github/PR_TEMPLATE.md` oluşturursa, body kısmını `--body "$(cat .github/PR_TEMPLATE.md)"` ile değiştir.
+> **Nota:** Se a equipe criar `.github/PR_TEMPLATE.md`, substitua a parte do body por `--body "$(cat .github/PR_TEMPLATE.md)"`.
 
 ---
 
-### 7. CHANGELOG Güncelle
+### 7. Atualizar o CHANGELOG
 
-Her PR için `CHANGELOG.md`'nin `[Unreleased]` bölümüne ekle:
+Para cada PR, adicione à seção `[Unreleased]` do `CHANGELOG.md`:
 
 ```markdown
 ## [Unreleased]
@@ -240,27 +242,27 @@ Her PR için `CHANGELOG.md`'nin `[Unreleased]` bölümüne ekle:
 
 ---
 
-## Özel Durumlar
+## Situações Especiais
 
-### Hotfix (Production Emergency)
+### Hotfix (Emergência em Produção)
 ```bash
-# Main'den hotfix branch aç
+# Abra uma branch de hotfix a partir da main
 git checkout -b hotfix/null-pointer-login main
 
-# Düzelt → test → commit
+# Corrija → teste → commit
 git commit -m "fix(auth): prevent null pointer when user session expires"
 
-# Hem main'e hem aktif development branch'e merge
+# Faça merge na main e na branch de development ativa
 git checkout main && git merge hotfix/null-pointer-login
 git checkout develop && git merge hotfix/null-pointer-login
 ```
 
-### Commit Geri Alma (Push Öncesi)
+### Reverter um Commit (Antes do Push)
 ```bash
-git reset HEAD~1 --soft    # Commit geri al, değişiklikler staged kalır
+git reset HEAD~1 --soft    # Reverte o commit, as alterações continuam staged
 ```
 
-### Tag ve Release
+### Tag e Release
 ```bash
 git tag -a v1.2.0 -m "Release v1.2.0 — user registration feature"
 git push origin v1.2.0
@@ -268,23 +270,23 @@ git push origin v1.2.0
 
 ---
 
-## Yasaklar
+## Proibições
 
-- `git push --force` (force push) — sadece personal branch'te, hiçbir zaman `main`'e
-- `git commit -m "fix"` — anlamsız commit mesajı
-- `git add .` — staging kontrol edilmeden hepsini ekleme
-- `git commit --no-verify` — pre-commit hook'ları atlama
-- Direkt `main`'e push — pull request olmadan
+- `git push --force` (force push) — apenas em branch pessoal, nunca na `main`
+- `git commit -m "fix"` — mensagem de commit sem significado
+- `git add .` — adicionar tudo sem conferir o staging
+- `git commit --no-verify` — pular os pre-commit hooks
+- Push direto na `main` — sem pull request
 
 ---
 
-## Hızlı Referans
+## Referência Rápida
 
 ```bash
-# Tam iş akışı
+# Fluxo de trabalho completo
 git checkout -b feat/my-feature           # 1. Branch
-# → code-review skill (MOD A)             # 2. Review
-git add <ilgili dosyalar>                  # 3. Stage
+# → code-review skill (MODO A)            # 2. Revisão
+git add <arquivos relevantes>             # 3. Stage
 git commit -m "feat(scope): description"  # 4. Commit
 git push -u origin feat/my-feature        # 5. Push
 gh pr create --title "..." --body "..."   # 6. PR

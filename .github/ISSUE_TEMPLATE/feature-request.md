@@ -1,22 +1,22 @@
 ---
-name: Feature Request
-about: Yeni bir skill, agent veya iyileştirme önerin
+name: Solicitação de Funcionalidade
+about: Sugira uma nova skill, agente ou melhoria
 title: "[FEATURE] "
 labels: enhancement
 ---
 
-## Sorun
+## Problema
 
-<!-- Bu özellik hangi ihtiyacı karşılıyor? -->
+<!-- Qual necessidade esta funcionalidade atende? -->
 
-## Önerilen Çözüm
+## Solução Proposta
 
-<!-- Özelliği veya iyileştirmeyi açıklayın -->
+<!-- Descreva a funcionalidade ou melhoria -->
 
-## Düşünülen Alternatifler
+## Alternativas Consideradas
 
-<!-- Hangi alternatif yaklaşımlar değerlendirildi? -->
+<!-- Quais abordagens alternativas foram avaliadas? -->
 
-## Ek Bağlam
+## Contexto Adicional
 
-<!-- Ek bilgi, ekran görüntüsü veya referanslar -->
+<!-- Informações extras, screenshots ou referências -->

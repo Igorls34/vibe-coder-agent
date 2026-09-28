@@ -1,158 +1,162 @@
 <!--
-  TÜRKÇE AÇIKLAMA
+  DESCRIÇÃO
   ───────────────
-  Bu skill, bir fikir veya problemi Sokratik yöntemle rafine eder. Agent sana
-  cevap vermez — sorular sorar. Bu sorular aracılığıyla fikrin netleşir, varsayımlar
-  sorgulanır, kapsam belirlenir ve gerçek ihtiyaç ortaya çıkar. "Ne yapalım?"
-  sorusunu "Tam olarak ne yapmamız gerekiyor ve neden?" sorusuna dönüştürür.
+  Esta skill refina uma ideia ou um problema com o método socrático. O agente
+  não responde a você — ele faz perguntas. Por meio dessas perguntas a ideia
+  fica clara, as premissas são questionadas, o escopo é definido e a
+  necessidade real vem à tona. Ela transforma "o que vamos fazer?" em "o que
+  exatamente precisamos fazer e por quê?".
 
-  NE ZAMAN: Yeni bir özellik veya proje fikri gündeme geldiğinde, gereksinimler
-            belirsiz olduğunda, ekip arasında farklı anlayışlar olduğunda.
-  ÇIKTI:    Scope doc — netleşmiş problem, kapsam, kısıtlar, başarı kriterleri.
+  QUANDO: Quando surge uma nova funcionalidade ou ideia de projeto, quando os
+          requisitos estão indefinidos ou quando existem entendimentos
+          diferentes dentro do time.
+  SAÍDA:   Scope doc — problema esclarecido, escopo, restrições, critérios de
+           sucesso.
 -->
 
 ---
 name: brainstorming
 description: >
-  Socratic design refinement skill. Rather than jumping to solutions, this skill
-  asks targeted questions to clarify the problem, challenge assumptions, define
-  scope, and surface the real need. Turns "what should we build?" into a
-  crisp, agreed-upon problem statement with success criteria.
+  Skill de refino de design socrático. Em vez de pular direto para a solução,
+  esta skill faz perguntas direcionadas para esclarecer o problema, desafiar
+  premissas, definir o escopo e revelar a necessidade real. Transforma "o que
+  devemos construir?" em uma declaração de problema clara e acordada, com
+  critérios de sucesso.
 ---
 
-# Brainstorming Skill — Socratic Design Refinement
+# Skill de Brainstorming — Refino de Design Socrático
 
-## Felsefe
+## Filosofia
 
-İyi çözümler iyi sorulardan gelir. Bu skill bir cevap üretmez — doğru soruları sormak için bir çerçeve sunar. Bir fikrin %80'i ilk ifade edilişinde eksiktir. Bu eksikliği kodu yazarken değil, düşünürken bulmak gerekir.
+Boas soluções vêm de boas perguntas. Esta skill não produz uma resposta — ela oferece uma estrutura para fazer as perguntas certas. 80% de uma ideia está incompleta no momento em que é expressa. Essa lacuna precisa ser encontrada enquanto se pensa, não enquanto se escreve código.
 
-> "If I had an hour to solve a problem, I'd spend 55 minutes thinking about the problem and 5 minutes thinking about solutions." — Einstein
-
----
-
-## Süreç
-
-### Aşama 1: Problemi Dinle
-
-Kullanıcı veya ekip fikri ifade eder. **Hemen çözüm önerme.** Önce şu soruları sor:
-
-#### 🎯 Problem Netliği
-- Bu özelliği/sistemi neden yapıyoruz? Hangi acıyı çözüyor?
-- Bu olmadan ne oluyor? Şu an insanlar bu ihtiyacı nasıl karşılıyor?
-- Kim için yapıyoruz? Bu kişilerin bugünkü günlük rutini nasıl?
-
-#### 📏 Kapsam Sınırları
-- Bu projenin kesinlikle kapsam **içinde** olduğu şeyler neler?
-- Kesinlikle kapsam **dışında** olduğu şeyler neler?
-- "Sonra ekleriz" dediklerimiz neler? (bunları şimdi tanımla, sonra tartışma)
-
-#### ⚡ Kısıtlar
-- Zaman kısıtı var mı? Sabit bir deadline var mı?
-- Teknik kısıt var mı? (mevcut stack, bütçe, ekip kapasitesi)
-- Düzenleyici veya yasal kısıt var mı?
-
-#### ✅ Başarı Kriterleri
-- Bu projenin başarılı olduğunu nasıl anlayacağız?
-- Hangi metrik veya gözlem "bitti" dedirtir?
-- 6 ay sonra bu kararı doğru mu yanlış mı bulduk — bunu ne belirler?
+> "Se eu tivesse uma hora para resolver um problema, gastaria 55 minutos pensando no problema e 5 minutos pensando em soluções." — Einstein
 
 ---
 
-### Aşama 2: Varsayımları Zorla
+## Processo
 
-Her fikrin altında açıklanmamış varsayımlar yatar. Bunları yüzeye çıkar:
+### Fase 1: Ouvir o Problema
+
+O usuário ou o time expressa a ideia. **Não proponha soluções imediatamente.** Antes, faça estas perguntas:
+
+#### 🎯 Clareza do Problema
+- Por que estamos construindo esta funcionalidade/sistema? Qual dor ela resolve?
+- O que acontece sem isso? Como as pessoas atendem a essa necessidade hoje?
+- Para quem estamos construindo? Como é a rotina diária dessas pessoas hoje?
+
+#### 📏 Limites de Escopo
+- O que com certeza está **dentro** do escopo deste projeto?
+- O que com certeza está **fora** do escopo?
+- O que dizemos "adicionamos depois"? (defina isso agora; a discussão fica para depois)
+
+#### ⚡ Restrições
+- Existe restrição de tempo? Há um deadline fixo?
+- Existe restrição técnica? (stack atual, orçamento, capacidade do time)
+- Existe restrição regulatória ou legal?
+
+#### ✅ Critérios de Sucesso
+- Como saberemos que este projeto foi bem-sucedido?
+- Qual métrica ou observação vai nos fazer dizer "terminou"?
+- O que vai nos dizer, 6 meses depois, se esta decisão estava certa ou errada?
+
+---
+
+### Fase 2: Forçar as Premissas
+
+Toda ideia tem premissas não explicitadas por baixo. Traga-as para a superfície:
 
 ```
-"Kullanıcılar bu özelliği kullanmak isteyecek"
-→ Bunu nasıl biliyoruz? Test ettik mi?
+"Os usuários vão querer usar esta funcionalidade"
+→ Como sabemos disso? Já testamos?
 
-"Bu backend değişikliği basit olacak"
-→ Bunu kim söyledi? Mevcut kodu bilen biri mi değerlendirdi?
+"Esta mudança no backend vai ser simples"
+→ Quem disse isso? Alguém que conhece o código atual fez essa avaliação?
 
-"Önce X, sonra Y"
-→ Neden bu sıra? Y olmadan X işe yarar mı?
+"Primeiro X, depois Y"
+→ Por que nesta ordem? X funciona sem Y?
 
-"Mobil kullanıcılar önemli değil"
-→ Mevcut analytics'e baktık mı? Bu bir karar mı, bir varsayım mı?
+"Usuários mobile não são importantes"
+→ Já olhamos as analytics atuais? Isso é uma decisão ou uma premissa?
 ```
 
-Her varsayımı şu şekilde sınıflandır:
-- **Doğrulanmış:** Kanıtı var, güvenle devam
-- **Makul:** Mantıklı ama test edilmemiş — riski not et
-- **Tehlikeli:** Kanıtsız, yüksek etkili — önce doğrula
+Classifique cada premissa assim:
+- **Verificada:** há evidência, prossiga com confiança
+- **Razoável:** faz sentido, mas não foi testada — anote o risco
+- **Perigosa:** sem evidência e com alto impacto — valide antes
 
 ---
 
-### Aşama 3: Alternatifleri Değerlendir
+### Fase 3: Avaliar as Alternativas
 
-En az 3 yaklaşım üret ve karşılaştır:
+Produza pelo menos 3 abordagens e compare-as:
 
-| Yaklaşım | Artılar | Eksiler | Risk | Çaba |
+| Abordagem | Prós | Contras | Risco | Esforço |
 |----------|---------|---------|------|------|
-| Seçenek A | ... | ... | Düşük | 2 gün |
-| Seçenek B | ... | ... | Orta | 1 hafta |
-| Seçenek C | ... | ... | Yüksek | 3 hafta |
+| Opção A | ... | ... | Baixo | 2 dias |
+| Opção B | ... | ... | Médio | 1 semana |
+| Opção C | ... | ... | Alto | 3 semanas |
 
-**"Hiç yapmama" seçeneğini her zaman tabloya ekle.** Bu seçeneğin maliyeti nedir?
-
----
-
-### Aşama 4: Minimum Değerli Slice'ı Bul
-
-Tam projeyi bir anda yapmak yerine:
-- Değerin %80'ini veren %20'lik kısım nedir?
-- Kullanıcıya en hızlı değer katan ilk slice ne?
-- İlk iterasyonda kesinlikle olmaması gereken şeyler neler?
-
-```
-MVP = [özellik A, özellik B]
-İterasyon 2 = [özellik C, özellik D]
-Gelecek = [özellik E] — gerekirse
-```
+**Sempre inclua a opção "não fazer nada" na tabela.** Qual é o custo dessa opção?
 
 ---
 
-### Aşama 5: Scope Doc Yaz
+### Fase 4: Encontrar o Slice de Mínimo Valor
 
-Tüm soruları yanıtlandıktan sonra `.agent/SCOPE-<slug>.md` dosyasına yaz:
+Em vez de construir o projeto inteiro de uma vez:
+- Qual é a parte de 20% que entrega 80% do valor?
+- Qual é o primeiro slice que entrega valor ao usuário mais rápido?
+- O que com certeza não deve existir na primeira iteração?
+
+```
+MVP = [funcionalidade A, funcionalidade B]
+Iteração 2 = [funcionalidade C, funcionalidade D]
+Futuro = [funcionalidade E] — se necessário
+```
+
+---
+
+### Fase 5: Escrever o Scope Doc
+
+Depois que todas as perguntas forem respondidas, escreva no arquivo `.agent/SCOPE-<slug>.md`:
 
 ```markdown
-# Scope: <proje adı>
-**Tarih:** <YYYY-MM-DD>
-**Karar Verenler:** <isimler>
+# Escopo: <nome do projeto>
+**Data:** <YYYY-MM-DD>
+**Responsáveis pela Decisão:** <nomes>
 
-## Problem
-<Tek paragraf — ne acısını çözüyoruz, kimin için>
+## Problema
+<Um parágrafo — qual dor estamos resolvendo, para quem>
 
-## Kapsam İçi
-- <madde>
+## Dentro do Escopo
+- <item>
 
-## Kapsam Dışı
-- <madde>
+## Fora do Escopo
+- <item>
 
-## Başarı Kriterleri
-1. <ölçülebilir kriter>
-2. <ölçülebilir kriter>
+## Critérios de Sucesso
+1. <critério mensurável>
+2. <critério mensurável>
 
-## Doğrulanmamış Varsayımlar
-- <varsayım> → <nasıl doğrulanacak>
+## Premissas Não Verificadas
+- <premissa> → <como será verificada>
 
-## Seçilen Yaklaşım
-<Seçenek X seçildi çünkü...>
+## Abordagem Escolhida
+<A Opção X foi escolhida porque...>
 
-## İlk Slice (MVP)
-<Ne yapılacak, ne yapılmayacak>
+## Primeiro Slice (MVP)
+<O que será feito, o que não será feito>
 
-## Sonraki Adım
-→ `writing-plans` skill'i ile implementasyon planı oluştur
+## Próximo Passo
+→ Use a skill `writing-plans` para criar o plano de implementação
 ```
 
 ---
 
-## Kurallar
+## Regras
 
-- **Çözüme atlamak yasak.** Scope doc tamamlanmadan `writing-plans` başlamaz.
-- **"Bence şöyle yapalım" demek yasak.** Bu skill soru sorar, cevap vermez.
-- **Her varsayımı kayıt altına al.** Doğrulanmamış varsayım = gizli risk.
-- **Scope doc kısa olmalı.** 1 sayfa yeterli. Daha uzunsa kapsam çok büyük.
-- **İlk iterasyona "sonra ekleriz" girmez.** Girdiyse kesmek için argüman yok.
+- **Pular para a solução é proibido.** O `writing-plans` não começa antes de o scope doc estar completo.
+- **É proibido dizer "na minha visão, vamos fazer assim".** Esta skill faz perguntas, não dá respostas.
+- **Registre todas as premissas.** Premissa não verificada = risco oculto.
+- **O scope doc deve ser curto.** 1 página basta. Se estiver mais longo, o escopo está grande demais.
+- **"Adicionamos depois" não entra na primeira iteração.** Se entrou, não há argumento para cortar.

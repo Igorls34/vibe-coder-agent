@@ -1,61 +1,65 @@
 ---
 name: test-driven-execution
 description: >
-  Before writing any implementation code, define the acceptance criteria and
-  test cases that the code must satisfy. Agents then write code to pass these
-  tests — not to match a vague description. Eliminates "it works on my machine"
-  and "I think this is what you wanted" outcomes.
+  Antes de escrever qualquer código de implementação, defina os critérios de
+  aceitação e os casos de teste que o código precisa satisfazer. Os agentes
+  então escrevem código para passar nesses testes — e não para corresponder a
+  uma descrição vaga. Elimina resultados do tipo "na minha máquina funciona" e
+  "acho que era isso que você queria".
 ---
 
 <!--
-  TÜRKÇE AÇIKLAMA
+  DESCRIÇÃO
   ───────────────
-  Bu skill, implementasyon kodu yazmadan önce "başarı kriterleri"ni ve test senaryolarını
-  tanımlar. Agent, kodu belirsiz bir tanıma değil — somut testleri geçmek için yazar.
-  Kırmızı→Yeşil→Refactor döngüsünü uygular. "Bence çalışıyor" yerine "testler geçiyor" der.
+  Esta skill define os "critérios de sucesso" e os cenários de teste antes de
+  qualquer código de implementação ser escrito. O agente escreve o código para
+  passar em testes concretos — e não para atender a uma definição vaga. Ela
+  aplica o ciclo Vermelho → Verde → Refatoração. Em vez de "acho que funciona",
+  ela diz "os testes passam".
 
-  NE ZAMAN: Her yeni feature veya bug fix'ten önce. Test spec olmadan kod yazılmaz.
-  ÇIKTI:    Geçen testler, coverage raporu, "Task Complete" özeti.
+  QUANDO: Antes de cada nova funcionalidade ou correção de bug. Nenhum código é
+          escrito sem uma spec de teste.
+  SAÍDA:   Testes passando, relatório de coverage, resumo de "Tarefa Concluída".
 -->
 
-# Test-Driven Execution Skill
+# Skill de Execução Orientada a Testes
 
-## When to Trigger
+## Quando Disparar
 
-- At the start of any feature or task from a plan
-- When a bug fix is requested (test first, then fix)
-- When a subagent is about to implement a module
-- When "done" is ambiguous and needs a clear definition
+- No início de qualquer funcionalidade ou tarefa vinda de um plano
+- Quando uma correção de bug é pedida (primeiro o teste, depois a correção)
+- Quando um subagente está prestes a implementar um módulo
+- Quando "terminou" é ambíguo e precisa de uma definição clara
 
-## Philosophy
+## Filosofia
 
-> "A feature is not done when code is written. It is done when the tests pass."
+> "Uma funcionalidade não está pronta quando o código é escrito. Ela está pronta quando os testes passam."
 
-Tests written *before* code serve three purposes:
-1. They force clarity on what "correct" actually means
-2. They prevent the agent from drifting into over-engineering
-3. They provide instant verification that the task is complete
+Testes escritos *antes* do código servem a três propósitos:
+1. Eles forçam a clareza sobre o que significa "correto" de fato
+2. Eles impedem que o agente se desvie para o over-engineering
+3. Eles fornecem verificação instantânea de que a tarefa está completa
 
-## Step-by-Step Process
+## Processo Passo a Passo
 
-### 1. Extract Acceptance Criteria
+### 1. Extrair os Critérios de Aceitação
 
-Read the task description and extract every "must" and "should":
+Leia a descrição da tarefa e extraia todo "deve" e todo "deveria":
 
-**Example task:** *"Add a user registration endpoint"*
+**Tarefa de exemplo:** *"Adicionar um endpoint de registro de usuário"*
 
-Extracted criteria:
-- Must accept `email`, `password`, `name` in request body
-- Must return 201 on success with the created user (excluding password)
-- Must return 400 if email is already registered
-- Must return 422 if fields are missing or invalid
-- Must hash the password before storing
+Critérios extraídos:
+- Deve aceitar `email`, `password`, `name` no body da requisição
+- Deve retornar 201 em caso de sucesso, com o usuário criado (sem a senha)
+- Deve retornar 400 se o email já estiver registrado
+- Deve retornar 422 se algum campo estiver faltando ou for inválido
+- Deve fazer o hash da senha antes de armazenar
 
-### 2. Write the Test Specification
+### 2. Escrever a Especificação de Testes
 
-Before writing any implementation, write the tests (or test outlines):
+Antes de escrever qualquer implementação, escreva os testes (ou os outlines):
 
-#### For unit tests:
+#### Para testes unitários:
 
 ```javascript
 describe('registerUser()', () => {
@@ -66,7 +70,7 @@ describe('registerUser()', () => {
 })
 ```
 
-#### For integration/API tests:
+#### Para testes de integração/API:
 
 ```javascript
 describe('POST /api/auth/register', () => {
@@ -76,7 +80,7 @@ describe('POST /api/auth/register', () => {
 })
 ```
 
-#### For UI/E2E tests:
+#### Para testes de UI/E2E:
 
 ```
 Scenario: Successful registration
@@ -87,83 +91,83 @@ Scenario: Successful registration
   And I should see "Welcome, <name>"
 ```
 
-### 3. Confirm Tests Fail (Red)
+### 3. Confirmar que os Testes Falham (Vermelho)
 
-Run the tests *before* writing any implementation:
+Rode os testes *antes* de escrever qualquer implementação:
 
 ```bash
 npm test
-# or
+# ou
 pytest
 # etc.
 ```
 
-**Expected:** All new tests fail. This confirms the tests are correctly detecting the absence of the feature. If a test passes before implementation, the test is wrong — fix it.
+**Esperado:** todos os novos testes falham. Isso confirma que os testes estão detectando corretamente a ausência da funcionalidade. Se um teste passar antes da implementação, o teste está errado — corrija-o.
 
-### 4. Write the Minimum Implementation (Green)
+### 4. Escrever a Implementação Mínima (Verde)
 
-Now implement the feature. The goal is simple: **make the tests pass**.
+Agora implemente a funcionalidade. O objetivo é simples: **fazer os testes passarem**.
 
-Rules during implementation:
-- Write only what is needed to pass the tests — nothing more
-- If you find yourself writing code with no corresponding test, stop and write the test first
-- Don't optimize yet — correctness first
+Regras durante a implementação:
+- Escreva apenas o que for necessário para os testes passarem — nada além
+- Se você se pegar escrevendo código sem teste correspondente, pare e escreva o teste primeiro
+- Não otimize ainda — corretude primeiro
 
 ```bash
-# Keep running tests as you go
+# Continue rodando os testes conforme avança
 npm test --watch
 ```
 
-### 5. Refactor (Refactor)
+### 5. Refatoração (Refatorar)
 
-Once all tests pass:
-- Clean up the code (naming, structure, duplication)
-- Run tests again after every refactor step to confirm nothing broke
-- Add edge case tests for anything discovered during implementation
+Depois que todos os testes passarem:
+- Limpe o código (nomenclatura, estrutura, duplicação)
+- Rode os testes novamente após cada passo de refatoração para confirmar que nada quebrou
+- Adicione testes de edge case para tudo o que for descoberto durante a implementação
 
-### 6. Define the Done Checklist
+### 6. Definir o Checklist de Conclusão
 
-A task is complete when:
+Uma tarefa está completa quando:
 
-- [ ] All acceptance criteria from Step 1 have a corresponding test
-- [ ] All tests pass (`npm test` exits with code 0)
-- [ ] No test is skipped (no `.skip`, `xtest`, `# noqa`)
-- [ ] Code coverage for the new module is ≥ 80% (check with `--coverage`)
-- [ ] No existing tests were broken by this change
+- [ ] Todos os critérios de aceitação da Etapa 1 têm um teste correspondente
+- [ ] Todos os testes passam (`npm test` termina com código 0)
+- [ ] Nenhum teste foi pulado (sem `.skip`, `xtest`, `# noqa`)
+- [ ] A cobertura de código do novo módulo é ≥ 80% (verifique com `--coverage`)
+- [ ] Nenhum teste existente foi quebrado por esta mudança
 
-### 7. Report Completion
+### 7. Reportar a Conclusão
 
 ```
-## Task Complete: <feature name>
+## Tarefa Concluída: <nome da funcionalidade>
 
-**Tests written:** <N>
-**Tests passing:** <N>/<N>
-**Coverage:** <X>%
-**Acceptance criteria covered:**
-  ✅ Creates user with hashed password
-  ✅ Returns 400 on duplicate email
-  ✅ Returns 422 on validation failure
-  ✅ Never stores plaintext password
+**Testes escritos:** <N>
+**Testes passando:** <N>/<N>
+**Cobertura:** <X>%
+**Critérios de aceitação cobertos:**
+  ✅ Cria o usuário com a senha em hash
+  ✅ Retorna 400 em caso de email duplicado
+  ✅ Retorna 422 em caso de falha de validação
+  ✅ Nunca armazena a senha em texto puro
 
-**Not covered (and why):**
-  ⚠️ Email delivery test — skipped, requires mock SMTP setup
+**Não cobertos (e por quê):**
+  ⚠️ Teste de entrega de email — pulado, exige a configuração de um SMTP mock
 ```
 
-## Test Naming Convention
+## Convenção de Nomenclatura de Testes
 
-Test names must read as requirements:
+Os nomes dos testes devem ser lidos como requisitos:
 
 ✅ `it('returns 400 when email already exists')`
 ✅ `it('never exposes password in API response')`
 ❌ `it('test email duplicate')`
 ❌ `it('works correctly')`
 
-If you can't name the test clearly, the requirement isn't clear enough — clarify before writing.
+Se você não consegue nomear o teste claramente, o requisito não está claro o suficiente — esclareça antes de escrever.
 
-## Rules
+## Regras
 
-- **No implementation before test spec.** The spec can be pseudocode / outlines, but it must exist.
-- **A failing test is not a failure** — it is a correctly written test in the red phase.
-- **Never delete a test to make the suite pass.** Fix the code or fix the test — with justification.
-- **Integration tests are not optional** for public-facing APIs.
-- **Coverage % is a proxy, not a goal.** 100% coverage with meaningless assertions is worse than 70% with real ones.
+- **Nenhuma implementação antes da spec de teste.** A spec pode ser pseudocódigo / outlines, mas ela precisa existir.
+- **Um teste que falha não é uma falha** — é um teste escrito corretamente na fase vermelha.
+- **Nunca exclua um teste para fazer a suíte passar.** Corrija o código ou corrija o teste — com justificativa.
+- **Testes de integração não são opcionais** para APIs públicas.
+- **Coverage % é um proxy, não uma meta.** 100% de cobertura com asserções sem sentido é pior do que 70% com asserções de verdade.

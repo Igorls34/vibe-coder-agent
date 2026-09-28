@@ -1,168 +1,170 @@
 ---
 name: documentation-sync
 description: >
-  After any significant code change — new feature, API modification, config
-  change, or architectural refactor — run this skill to identify which
-  documentation files are now stale and update them. Keeps docs and code
-  from drifting apart.
+  Após qualquer mudança significativa de código — nova funcionalidade,
+  modificação de API, mudança de configuração ou refatoração arquitetural —
+  execute esta skill para identificar quais arquivos de documentação ficaram
+  desatualizados e atualizá-los. Evita que docs e código se desalinhem.
 ---
 
 <!--
-  TÜRKÇE AÇIKLAMA
+  DESCRIÇÃO
   ───────────────
-  Bu skill, kodda yapılan önemli değişikliklerden sonra hangi dokümantasyon dosyalarının
-  eskidiğini tespit edip günceller. README, API docs, .env.example, CHANGELOG ve mimari
-  diyagramlar incelenerek eski bilgiler düzeltilir. "Docs ile kod arasındaki uçurum"
-  problemini kapatır.
+  Esta skill detecta e atualiza quais arquivos de documentação ficaram
+  desatualizados após mudanças importantes no código. README, documentação de
+  API, .env.example, CHANGELOG e diagramas de arquitetura são revisados e as
+  informações obsoletas são corrigidas. Fecha o problema do "abismo entre docs e
+  código".
 
-  NE ZAMAN: API eklendiğinde/değiştiğinde, yeni env variable eklendiğinde,
-            büyük refactor sonrası, merge öncesi veya sonrası.
-  ÇIKTI:    Güncellenmiş doc dosyaları + değişim özet raporu.
+  QUANDO: Quando uma API é adicionada ou alterada, quando uma nova env variable
+          é criada, após uma refatoração grande, antes ou depois do merge.
+  SAÍDA:   Arquivos de doc atualizados + relatório de resumo das mudanças.
 -->
 
-# Documentation Sync Skill
+# Skill de Sincronização de Documentação
 
-## When to Trigger
+## Quando é Disparado
 
-Run after:
-- A public API endpoint is added, changed, or removed
-- A CLI command or flag is modified
-- A new environment variable or config key is introduced
-- A major component or module is refactored
-- A new npm/pip/etc. package is added or removed from dependencies
-- Any `README.md` reference becomes inaccurate
+Execute após:
+- Um endpoint público de API ser adicionado, alterado ou removido
+- Um comando ou flag de CLI ser modificado
+- Uma nova variável de ambiente ou chave de config ser introduzida
+- Um componente ou módulo principal ser refatorado
+- Um pacote npm/pip/etc. novo ser adicionado ou removido das dependências
+- Qualquer referência em `README.md` ficar imprecisa
 
-## Step-by-Step Process
+## Processo Passo a Passo
 
-### 1. Identify What Changed
+### 1. Identifique o que Mudou
 
-Review the git diff of the work just completed:
+Revise o git diff do trabalho recém-concluído:
 
 ```bash
-git diff main --name-only          # Files changed vs main
-git diff HEAD~1 --name-only        # Files changed in last commit
+git diff main --name-only          # Arquivos alterados em relação à main
+git diff HEAD~1 --name-only        # Arquivos alterados no último commit
 ```
 
-Categorize changes:
-- **API changes** → affects `docs/api/`, OpenAPI/Swagger specs, `README.md`
-- **Config changes** → affects `.env.example`, `docs/configuration.md`
-- **Dependency changes** → affects `README.md` (setup section), `docs/getting-started.md`
-- **Architecture changes** → affects `docs/architecture.md`, diagrams
-- **New features** → affects `docs/features/`, changelogs
+Categorize as mudanças:
+- **Mudanças de API** → afetam `docs/api/`, specs OpenAPI/Swagger, `README.md`
+- **Mudanças de config** → afetam `.env.example`, `docs/configuration.md`
+- **Mudanças de dependências** → afetam `README.md` (seção de setup), `docs/getting-started.md`
+- **Mudanças de arquitetura** → afetam `docs/architecture.md`, diagramas
+- **Novas funcionalidades** → afetam `docs/features/`, changelogs
 
-### 2. Audit Existing Docs
+### 2. Audite a Documentação Existente
 
-For each affected category, check whether corresponding docs exist:
+Para cada categoria afetada, verifique se a documentação correspondente existe:
 
 ```
 docs/
-  api/             ← REST/GraphQL endpoint docs
-  architecture.md  ← System design, component diagram
-  configuration.md ← All env vars and config options
-  getting-started.md ← Local setup guide
-  features/        ← Per-feature descriptions
-CHANGELOG.md       ← Version history
-README.md          ← Project overview + quickstart
+  api/             ← docs de endpoints REST/GraphQL
+  architecture.md  ← design do sistema, diagrama de componentes
+  configuration.md ← todas as env vars e opções de config
+  getting-started.md ← guia de setup local
+  features/        ← descrições por funcionalidade
+CHANGELOG.md       ← histórico de versões
+README.md          ← visão geral do projeto + quickstart
 ```
 
-For each doc file that touches the changed area, read it and flag stale sections.
+Para cada arquivo de doc que toca a área alterada, leia-o e sinalize as seções desatualizadas.
 
-### 3. Update Docs — Priority Order
+### 3. Atualize a Documentação — Ordem de Prioridade
 
-Update in this order (highest impact first):
+Atualize nesta ordem (do maior impacto para o menor):
 
 #### A. README.md
-- Setup instructions still accurate?
-- Tech stack section reflects current stack?
-- Any removed features still mentioned?
+- As instruções de setup continuam precisas?
+- A seção de stack de tecnologia reflete a stack atual?
+- Ainda há funcionalidades removidas sendo mencionadas?
 
-#### B. .env.example / Configuration Docs
-For every new env variable added to code, add a corresponding entry:
+#### B. .env.example / Documentação de Configuração
+Para cada nova env variable adicionada ao código, adicione a entrada correspondente:
 
 ```bash
-# Description of what this does
+# Descrição do que isto faz
 NEW_VAR_NAME=example_value
 ```
 
-Document in `docs/configuration.md`:
+Documente em `docs/configuration.md`:
+
 ```markdown
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| NEW_VAR_NAME | Yes | — | What it controls |
+| Variável | Obrigatória | Padrão | Descrição |
+|----------|-------------|--------|-----------|
+| NEW_VAR_NAME | Sim | — | O que ela controla |
 ```
 
-#### C. API Docs
-For every endpoint change, update the relevant doc:
+#### C. Documentação de API
+Para cada mudança de endpoint, atualize o doc correspondente:
 
 ```markdown
 ### POST /api/resource
 
-**Changed in:** <date or version>
-**Description:** ...
+**Alterado em:** <data ou versão>
+**Descrição:** ...
 **Request Body:** ...
-**Response:** ...
-**Breaking Change:** Yes/No
+**Resposta:** ...
+**Breaking Change:** Sim/Não
 ```
 
 #### D. CHANGELOG.md
-Append an entry under `## [Unreleased]`:
+Adicione uma entrada em `## [Unreleased]`:
 
 ```markdown
 ### Added
-- <new feature description>
+- <descrição da nova funcionalidade>
 
 ### Changed
-- <what was modified and why>
+- <o que foi modificado e por quê>
 
 ### Fixed
-- <bug fixed>
+- <bug corrigido>
 
 ### Removed
-- <what was removed>
+- <o que foi removido>
 ```
 
-Follow [Keep a Changelog](https://keepachangelog.com) format.
+Siga o formato do [Keep a Changelog](https://keepachangelog.com).
 
-#### E. Architecture Docs
-If a new service, module, or significant component was added:
-- Update the component list in `docs/architecture.md`
-- Note any new external dependencies or integrations
-- If a diagram exists (Mermaid, Draw.io), update it
+#### E. Documentação de Arquitetura
+Se foi adicionado um novo serviço, módulo ou componente significativo:
+- Atualize a lista de componentes em `docs/architecture.md`
+- Registre quaisquer novas dependências externas ou integrações
+- Se houver um diagrama (Mermaid, Draw.io), atualize-o
 
-### 4. Verify Internal Links
+### 4. Verifique os Links Internos
 
-After editing, do a quick check for broken internal references:
+Após editar, faça uma verificação rápida de referências internas quebradas:
 
 ```bash
-# Find markdown links pointing to non-existent files
+# Encontrar links markdown apontando para arquivos inexistentes
 grep -r "\[.*\](.*\.md)" docs/ README.md | grep -v "http"
 ```
 
-Manually verify the top 5 most-used internal links still resolve.
+Verifique manualmente se os 5 links internos mais usados ainda resolvem.
 
-### 5. Report Changes
+### 5. Reporte as Mudanças
 
-Output a summary:
+Gere um resumo:
 
 ```
-## Documentation Sync Complete
+## Sincronização de Documentação Concluída
 
-**Files Updated:**
-- README.md — updated setup section
-- docs/configuration.md — added NEW_VAR_NAME
-- CHANGELOG.md — added unreleased entry
+**Arquivos Atualizados:**
+- README.md — seção de setup atualizada
+- docs/configuration.md — NEW_VAR_NAME adicionada
+- CHANGELOG.md — entrada não lançada adicionada
 
-**Files That May Need Manual Review:**
-- docs/architecture.md — diagram may be outdated (manual update needed)
+**Arquivos que Podem Precisar de Revisão Manual:**
+- docs/architecture.md — o diagrama pode estar desatualizado (atualização manual necessária)
 
-**No changes needed:**
-- docs/api/ — no endpoint changes detected
+**Sem necessidade de mudanças:**
+- docs/api/ — nenhuma mudança de endpoint detectada
 ```
 
-## Rules
+## Regras
 
-- **Never delete documentation** without confirming with the user. Archive or mark as deprecated instead.
-- **Don't invent information.** If you're unsure what a config variable does, write `# TODO: document this` and flag it.
-- **Keep CHANGELOG.md under `[Unreleased]`** until an explicit version bump/release.
-- **Every new env variable must appear in `.env.example`** — no exceptions.
-- **Docs first is fine, but docs-never is not.** Even minimal docs are better than none.
+- **Nunca exclua documentação** sem confirmar com o usuário. Arquive ou marque como obsoleta.
+- **Não invente informações.** Se não souber o que uma variável de config faz, escreva `# TODO: documentar isto` e sinalize.
+- **Mantenha tudo em `[Unreleased]` no CHANGELOG.md** até um bump/release explícito de versão.
+- **Toda nova env variable precisa aparecer no `.env.example`** — sem exceções.
+- **"Docs primeiro" tudo bem, "docs nunca" não.** Mesmo uma documentação mínima é melhor do que nenhuma.

@@ -1,156 +1,161 @@
 ---
 name: architecture-review
 description: >
-  Before committing to an implementation plan, run this skill to stress-test
-  the proposed architecture. Catches over-engineering, circular dependencies,
-  missing failure modes, security gaps, and scalability cliffs — before any
-  code is written. Acts as a "second eye" on the plan.
+  Antes de se comprometer com um plano de implementação, rode esta skill para
+  submeter a arquitetura proposta a um teste de estresse. Identifica
+  over-engineering, dependências circulares, modos de falha que faltam,
+  lacunas de segurança e gargalos de escalabilidade — antes de escrever
+  qualquer linha de código. Atua como um "segundo olhar" sobre o plano.
 ---
 
 <!--
-  TÜRKÇE AÇIKLAMA
+  DESCRIÇÃO
   ───────────────
-  Bu skill, bir implementasyon planı kod yazılmadan önce "ikinci göz" olarak
-  stres testine tabi tutar. Aşırı mühendislik, döngüsel bağımlılıklar, eksik
-  hata senaryoları, güvenlik açıkları ve ölçeklenebilirlik sorunlarını erken tespit eder.
-  Yanlış temele inşa etmenin maliyeti çok yüksektir — bu skill o maliyeti sıfıra indirir.
+  Esta skill submete um plano de implementação a um teste de estresse como
+  "segundo olhar" antes de o código ser escrito. Detecta cedo o
+  over-engineering, as dependências circulares, os cenários de erro que
+  faltam, as falhas de segurança e os problemas de escalabilidade.
+  Construir sobre uma base errada tem um custo muito alto — esta skill leva
+  esse custo a zero.
 
-  NE ZAMAN: Plan hazırlandıktan SONRA, kod yazmaya başlamadan ÖNCE. Zorunludur.
-  ÇIKTI:    🔴 Blocker / 🟡 Warning / 🔵 Note listesi + Approved/Revisions Required kararı.
+  QUANDO: DEPOIS de o plano estar pronto e ANTES de começar a escrever código.
+          É obrigatória.
+  SAÍDA:   Lista de 🔴 Bloqueador / 🟡 Aviso / 🔵 Nota + a decisão
+          Aprovado/Revisões Necessárias.
 -->
 
-# Architecture Review Skill
+# Skill de Revisão de Arquitetura
 
-## When to Trigger
+## Quando Disparar
 
-- After `writing-plans` produces an implementation plan, *before* `executing-plans`
-- When a significant refactor is proposed
-- When adding a new external service or integration
-- When the team is debating between two approaches
-- When something "feels off" about a design but you can't articulate why
+- Depois que `writing-plans` produzir um plano de implementação, *antes* de `executing-plans`
+- Quando uma refatoração relevante é proposta
+- Ao adicionar um novo serviço externo ou integração
+- Quando o time está debatendo entre duas abordagens
+- Quando algo "parece errado" em um design, mas você não consegue explicar por quê
 
-## Step-by-Step Process
+## Processo Passo a Passo
 
-### 1. Load the Plan
+### 1. Carregar o Plano
 
-Read the implementation plan (typically `implementation_plan.md` or the artifact from `writing-plans`).
+Leia o plano de implementação (normalmente `implementation_plan.md` ou o artefato de `writing-plans`).
 
-Extract:
-- Components being built
-- Data flow between components
-- External dependencies
-- Assumptions the plan makes
+Extraia:
+- Componentes que estão sendo construídos
+- Fluxo de dados entre os componentes
+- Dependências externas
+- Premissas que o plano faz
 
-### 2. Run the Checklists
+### 2. Percorrer os Checklists
 
-Work through each checklist section. For every "No" or "Unclear" answer, flag it as a finding.
-
----
-
-#### A. Complexity Check
-- [ ] Is this the simplest solution that could work?
-- [ ] Are there off-the-shelf solutions (libraries, services) that cover 80%+ of this?
-- [ ] Does each component have a single, clear responsibility?
-- [ ] Would a junior developer understand this in 30 minutes?
-
-#### B. Coupling & Cohesion
-- [ ] Can each module be tested in isolation?
-- [ ] Are there circular dependencies? (A needs B needs A)
-- [ ] Is data ownership clear? (only one place writes to each piece of state)
-- [ ] Is the public API surface minimal? (don't expose what doesn't need to be exposed)
-
-#### C. Data & State
-- [ ] Is the source of truth for each piece of data clearly defined?
-- [ ] What happens if the datastore goes down?
-- [ ] Is there any global mutable state? If so, is it justified?
-- [ ] Are database migrations planned for any schema changes?
-
-#### D. Failure Modes
-- [ ] What happens when each external service is unavailable?
-- [ ] Are there retry mechanisms with backoff for network calls?
-- [ ] Are there timeouts on all I/O operations?
-- [ ] Is there a circuit breaker if a downstream dependency degrades?
-- [ ] What does a partial failure look like to the user?
-
-#### E. Security
-- [ ] Is all user input validated and sanitized?
-- [ ] Are secrets managed via env vars / secrets manager (not hardcoded)?
-- [ ] Is authentication and authorization clearly separated?
-- [ ] Are there any SQL injection / XSS / CSRF vectors?
-- [ ] Does the principle of least privilege apply to service accounts?
-
-#### F. Scalability
-- [ ] What is the expected load in 6 months? Does the design handle it?
-- [ ] Are there any obvious N+1 query problems?
-- [ ] Is any caching planned? Is the invalidation strategy defined?
-- [ ] Are background jobs used for anything that could block the request cycle?
-
-#### G. Observability
-- [ ] Is structured logging planned?
-- [ ] Are there metrics/health endpoints?
-- [ ] Will errors surface in a monitoring tool (not just logs)?
-- [ ] Is there a way to trace a request end-to-end?
-
-#### H. Operability
-- [ ] Can this be deployed without downtime?
-- [ ] Is there a rollback plan if the deployment goes wrong?
-- [ ] Are environment differences (dev/staging/prod) documented?
+Percorra cada seção de checklist. Para cada resposta "Não" ou "Não claro", sinalize como um achado.
 
 ---
 
-### 3. Classify Findings
+#### A. Verificação de Complexidade
+- [ ] Esta é a solução mais simples que poderia funcionar?
+- [ ] Existem soluções prontas (bibliotecas, serviços) que cobrem 80%+ disso?
+- [ ] Cada componente tem uma responsabilidade única e clara?
+- [ ] Um desenvolvedor júnior entenderia isso em 30 minutos?
 
-For each "No" or "Unclear" found above, classify it:
+#### B. Acoplamento e Coesão
+- [ ] Cada módulo pode ser testado isoladamente?
+- [ ] Existem dependências circulares? (A precisa de B, B precisa de A)
+- [ ] A propriedade dos dados está clara? (apenas um lugar escreve cada parte do estado)
+- [ ] A superfície da API pública é mínima? (não exponha o que não precisa ser exposto)
 
-| Class | Meaning | Action |
+#### C. Dados e Estado
+- [ ] A fonte da verdade de cada dado está claramente definida?
+- [ ] O que acontece se o datastore cair?
+- [ ] Existe algum estado global mutável? Se sim, isso se justifica?
+- [ ] Há migrations de banco planejadas para qualquer mudança de schema?
+
+#### D. Modos de Falha
+- [ ] O que acontece quando cada serviço externo está indisponível?
+- [ ] Existem mecanismos de retry com backoff para as chamadas de rede?
+- [ ] Há timeouts em todas as operações de I/O?
+- [ ] Existe um circuit breaker caso uma dependência a jusante se degrade?
+- [ ] Como uma falha parcial aparece para o usuário?
+
+#### E. Segurança
+- [ ] Toda entrada do usuário é validada e sanitizada?
+- [ ] Os segredos são gerenciados via env vars / secrets manager (não hardcoded)?
+- [ ] Autenticação e autorização estão claramente separadas?
+- [ ] Há algum vetor de SQL injection / XSS / CSRF?
+- [ ] O princípio do menor privilégio se aplica às contas de serviço?
+
+#### F. Escalabilidade
+- [ ] Qual é a carga esperada em 6 meses? O design dá conta dela?
+- [ ] Há algum problema óbvio de query N+1?
+- [ ] Está previsto algum cache? A estratégia de invalidação está definida?
+- [ ] Jobs em background são usados para tudo que possa bloquear o ciclo da requisição?
+
+#### G. Observabilidade
+- [ ] Está previsto logging estruturado?
+- [ ] Há métricas/health endpoints?
+- [ ] Os erros aparecerão em uma ferramenta de monitoramento (e não só em logs)?
+- [ ] Há uma forma de rastrear uma requisição de ponta a ponta?
+
+#### H. Operabilidade
+- [ ] Isso pode ser implantado sem downtime?
+- [ ] Existe um plano de rollback caso o deploy saia errado?
+- [ ] As diferenças entre ambientes (dev/staging/prod) estão documentadas?
+
+---
+
+### 3. Classificar os Achados
+
+Para cada "Não" ou "Não claro" encontrado acima, classifique:
+
+| Classe | Significado | Ação |
 |-------|---------|--------|
-| 🔴 Blocker | Must fix before implementation | Revise plan |
-| 🟡 Warning | Should address, can proceed carefully | Add a task to backlog |
-| 🔵 Note | Nice to have, low risk | Document and move on |
+| 🔴 Bloqueador | Precisa ser corrigido antes da implementação | Revise o plano |
+| 🟡 Aviso | Deve ser tratado; é possível seguir com cuidado | Adicione uma tarefa ao backlog |
+| 🔵 Nota | Seria bom ter; risco baixo | Documente e siga em frente |
 
-### 4. Produce the Review Report
+### 4. Produzir o Relatório de Revisão
 
-Her zaman ayrı bir dosyaya yaz — **plan dosyasını kirletme**:
+Sempre escreva em um arquivo separado — **não suja o arquivo do plano**:
 ```
 .agent/reviews/architecture-review-<plan-slug>.md
 ```
 
-Eğer bu review'dan önemli bir mimari karar çıktıysa, ek olarak `knowledge-base-update` skill'ini kullanarak `decision` tipiyle knowledge base'e de ekle — `project-context-primer` oradan okuyacak.
+Se alguma decisão arquitetural importante saiu desta revisão, use também a skill `knowledge-base-update` para adicionar o item à base de conhecimento com o tipo `decision` — o `project-context-primer` vai lê-lo de lá.
 
 ```markdown
-# Architecture Review — <plan name>
-**Date:** <YYYY-MM-DD>
-**Reviewer:** Agent
+# Architecture Review — <nome do plano>
+**Data:** <YYYY-MM-DD>
+**Revisor:** Agent
 
-## Verdict
-<Approved | Approved with conditions | Revisions required>
+## Veredito
+<Aprovado | Aprovado com condições | Revisões necessárias>
 
-## 🔴 Blockers
-### 1. <Finding title>
-**Checklist item:** Failure Modes — timeout on I/O
-**Issue:** The email service call has no timeout. If SendGrid hangs, the entire request thread blocks.
-**Recommendation:** Wrap in a 5-second timeout; use a background job queue for non-critical emails.
+## 🔴 Bloqueadores
+### 1. <título do achado>
+**Item do checklist:** Modos de Falha — timeout em I/O
+**Problema:** A chamada ao serviço de email não tem timeout. Se o SendGrid travar, a thread inteira da requisição fica bloqueada.
+**Recomendação:** Envolva em um timeout de 5 segundos; use uma fila de jobs em background para emails não críticos.
 
-## 🟡 Warnings
-### 1. <Finding title>
+## 🟡 Avisos
+### 1. <título do achado>
 ...
 
-## 🔵 Notes
-### 1. <Finding title>
+## 🔵 Notas
+### 1. <título do achado>
 ...
 
-## Summary
-<Overall health of the architecture in 2-3 sentences.>
+## Resumo
+<Saúde geral da arquitetura em 2-3 frases.>
 ```
 
-### 5. Gate: Proceed or Revise?
+### 5. Gate: Prosseguir ou Revisar?
 
-- If there are any 🔴 **Blockers**: stop. Share the report with the user and revise the plan before any code is written.
-- If there are only 🟡/**🔵**: proceed, but ensure warnings are tracked as tasks.
+- Se houver algum 🔴 **Bloqueador**: pare. Compartilhe o relatório com o usuário e revise o plano antes de escrever qualquer código.
+- Se houver apenas 🟡/**🔵**: prossiga, mas garanta que os avisos sejam rastreados como tarefas.
 
-## Rules
+## Regras
 
-- **Be specific, not generic.** "You should add error handling" is useless. "The `fetchUser()` call on line 42 of the plan has no 404 handling" is a review.
-- **Don't block on stylistic preferences.** Blockers are objective risks, not taste.
-- **Never approve a plan with an undefined failure mode for a critical path.**
-- **If you can't understand part of the plan, that is itself a finding** — clarity is a requirement.
+- **Seja específico, não genérico.** "Você deveria adicionar tratamento de erro" não serve para nada. "A chamada `fetchUser()` na linha 42 do plano não tem tratamento para 404" é uma revisão de verdade.
+- **Não bloqueie por preferências de estilo.** Bloqueadores são riscos objetivos, não questão de gosto.
+- **Nunca aprove um plano com um modo de falha indefinido em um caminho crítico.**
+- **Se você não conseguir entender uma parte do plano, isso por si só já é um achado** — clareza é um requisito.

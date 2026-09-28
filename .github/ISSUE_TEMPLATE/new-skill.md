@@ -1,26 +1,26 @@
 ---
-name: Yeni Skill Teklifi
-about: Framework'e yeni bir skill önerin
+name: Proposta de Nova Skill
+about: Sugira uma nova skill para o framework
 title: "[SKILL] "
 labels: enhancement, skill
 ---
 
-## Skill Adı
+## Nome da Skill
 
-<!-- Örnek: performance-audit, database-seeding, api-mocking -->
+<!-- Exemplo: performance-audit, database-seeding, api-mocking -->
 
-## Ne Zaman Tetiklenmeli?
+## Quando Deve Ser Disparada?
 
-<!-- Bu skill hangi koşullarda devreye girmeli? -->
+<!-- Em quais condições esta skill deve entrar em ação? -->
 
-## Ne Yapmalı?
+## O Que Deve Fazer?
 
-<!-- Adım adım süreci açıklayın -->
+<!-- Descreva o processo passo a passo -->
 
-## Neden Gerekli?
+## Por Que é Necessária?
 
-<!-- Hangi boşluğu dolduruyor? Hangi sorunu çözüyor? -->
+<!-- Qual lacuna ela preenche? Qual problema resolve? -->
 
-## Örnek Çıktı
+## Exemplo de Saída
 
-<!-- İdeal çıktı nasıl görünmeli? -->
+<!-- Como deve ser a saída ideal? -->

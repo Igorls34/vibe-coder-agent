@@ -1,34 +1,34 @@
 ---
-name: Bug Report
-about: Bir skill, agent veya kuralla ilgili sorun bildirin
+name: Relatório de Bug
+about: Relate um problema relacionado a uma skill, agente ou regra
 title: "[BUG] "
 labels: bug
 ---
 
-## Sorun Açıklaması
+## Descrição do Problema
 
-<!-- Sorunu net bir şekilde açıklayın -->
+<!-- Descreva o problema de forma clara -->
 
-## Yeniden Üretme Adımları
+## Passos para Reproduzir
 
 1. 
 2. 
 3. 
 
-## Beklenen Davranış
+## Comportamento Esperado
 
-<!-- Olması gereken davranış nedir? -->
+<!-- Qual seria o comportamento correto? -->
 
-## Gerçekleşen Davranış
+## Comportamento Observado
 
-<!-- Ne oldu? -->
+<!-- O que aconteceu? -->
 
-## Ortam Bilgileri
+## Informações do Ambiente
 
-- İşletim Sistemi: 
-- AI Aracı: <!-- OpenCode, Cursor, Claude Code, vs. -->
-- Sürüm/Commit: 
+- Sistema Operacional: 
+- Ferramenta de IA: <!-- OpenCode, Cursor, Claude Code, etc. -->
+- Versão/Commit: 
 
-## Ek Bağlam
+## Contexto Adicional
 
-<!-- Log, ekran görüntüsü veya ilgili dosyalar -->
+<!-- Logs, screenshot ou arquivos relacionados -->

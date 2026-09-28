@@ -1,85 +1,89 @@
 ---
 name: project-context-primer
 description: >
-  Run this skill at the very start of any new conversation or agent session
-  before writing a single line of code. It loads the project's architectural
-  decisions, conventions, known gotchas, and current task status so the agent
-  operates with full context — not as a blank slate.
+  Execute esta skill no início de qualquer nova conversa ou sessão de agente,
+  antes de escrever uma única linha de código. Ela carrega as decisões
+  arquiteturais, as convenções, as armadilhas conhecidas e o status atual da
+  tarefa do projeto, para que o agente opere com contexto completo — e não do
+  zero.
 ---
 
 <!--
-  TÜRKÇE AÇIKLAMA
+  DESCRIÇÃO
   ───────────────
-  Bu skill, yeni bir konuşma veya agent oturumu başladığında projenin bağlamını
-  hızla yüklemek için kullanılır. Mimari kararlar, kurallar, bilinen tuzaklar ve
-  mevcut görev durumu yüklenerek agent "boş sayfa" modunda değil, tam bağlamla çalışır.
-  Kod yazmadan önce MUTLAKA çalıştırılmalıdır — bu, yeniden iş yapmanın en ucuz önlemidir.
+  Esta skill é usada para carregar rapidamente o contexto do projeto quando uma
+  nova conversa ou sessão de agente começa. Decisões arquiteturais, regras,
+  armadilhas conhecidas e o status atual da tarefa são carregados para que o
+  agente trabalhe com contexto completo, em vez do modo "página em branco".
+  Deve ser executada OBRIGATORIAMENTE antes de escrever código — é a prevenção
+  mais barata contra retrabalho.
 
-  NE ZAMAN: Her yeni konuşmanın ilk adımı olarak. HİÇBİR ZAMAN atlanmaz.
-  ÇIKTI:    "Context Loaded" özet bloğu — proje adı, stack, güncel görev, yüklenen bilgiler.
+  QUANDO: Como primeiro passo de toda nova conversa. NUNCA deve ser pulada.
+  SAÍDA:   Bloco de resumo "Contexto Carregado" — nome do projeto, stack, tarefa
+           atual, informações carregadas.
 -->
 
-# Project Context Primer Skill
+# Skill de Contexto do Projeto
 
-## When to Trigger
+## Quando Disparar
 
-**Always run first** when:
-- Starting a new conversation about this project
-- A subagent is spawned to work on a module
-- Picking up work after a gap of more than a day
-- Someone says "can you help with this project?" without any context
+**Sempre executar primeiro** quando:
+- Iniciar uma nova conversa sobre este projeto
+- Um subagente for criado para trabalhar em um módulo
+- Retomar o trabalho após um intervalo de mais de um dia
+- Alguém disser "você pode me ajudar com este projeto?" sem nenhum contexto
 
-## Step-by-Step Process
+## Processo Passo a Passo
 
-### 1. Load the Knowledge Index
+### 1. Carregar o Índice de Conhecimento
 
-Read `.agent/knowledge/INDEX.md` first.
+Leia `.agent/knowledge/INDEX.md` primeiro.
 
-The INDEX.md file contains rows in this format:
+O arquivo INDEX.md contém linhas neste formato:
 ```
-| Date | Type | Topic (linked) | One-line summary |
-```
-
-- Scan all rows for entries relevant to today's task
-- For each relevant row, follow the link and read the full `.agent/knowledge/<slug>.md` file
-- Pay special attention to entries of type `decision` and `gotcha` — these prevent the most costly mistakes
-- Extract the slug from the link: `[topic](./auth/token-refresh.md)` → slug is `auth/token-refresh`
-
-**If INDEX.md does not exist**, output this exact warning and proceed:
-```
-⚠️ Knowledge base not initialized (.agent/knowledge/INDEX.md missing).
-This means no architectural decisions, conventions, or gotchas have been recorded yet.
-Action: Use the `knowledge-base-update` skill at the end of this session to start building it.
+| Data | Tipo | Tópico (linkado) | Resumo em uma linha |
 ```
 
-### 2. Load the Project README
+- Examine todas as linhas em busca de entradas relevantes para a tarefa de hoje
+- Para cada linha relevante, siga o link e leia o arquivo completo `.agent/knowledge/<slug>.md`
+- Preste atenção especial às entradas dos tipos `decision` e `gotcha` — elas evitam os erros mais caros
+- Extraia o slug do link: `[topic](./auth/token-refresh.md)` → o slug é `auth/token-refresh`
 
-Read `README.md` (or `docs/README.md` if present).
-
-Extract and internalize:
-- What the project does (one sentence)
-- Tech stack (language, framework, major libraries)
-- How to run it locally
-- How to run tests
-
-### 3. Load Active Task Context
-
-Check for these files in order and read whichever exist:
-
+**Se o INDEX.md não existir**, emita exatamente este aviso e prossiga:
 ```
-.agent/CURRENT_TASK.md       ← What is being worked on right now
-.agent/OPEN_QUESTIONS.md     ← Decisions not yet made
+⚠️ Base de conhecimento não inicializada (.agent/knowledge/INDEX.md ausente).
+Isso significa que nenhuma decisão arquitetural, convenção ou armadilha foi registrada ainda.
+Ação: use a skill `knowledge-base-update` ao final desta sessão para começar a construí-la.
 ```
 
-> **Note:** Architectural decisions and past decisions are stored in `.agent/knowledge/` (via `knowledge-base-update` skill),
-> not in a separate DECISIONS_LOG. The INDEX.md (Step 1) is your decisions history.
+### 2. Carregar o README do Projeto
 
-If `.agent/CURRENT_TASK.md` exists, treat it as ground truth for your current mission.
-If it does not exist, ask the user what today's task is before proceeding.
+Leia `README.md` (ou `docs/README.md`, se existir).
 
-### 4. Scan Project Structure
+Extraia e internalize:
+- O que o projeto faz (uma frase)
+- Tech stack (linguagem, framework, principais bibliotecas)
+- Como executá-lo localmente
+- Como rodar os testes
 
-Run a shallow directory listing (top 2 levels) to understand layout:
+### 3. Carregar o Contexto da Tarefa Ativa
+
+Verifique estes arquivos nesta ordem e leia os que existirem:
+
+```
+.agent/CURRENT_TASK.md       ← O que está sendo trabalhado agora
+.agent/OPEN_QUESTIONS.md     ← Decisões ainda não tomadas
+```
+
+> **Observação:** decisões arquiteturais e decisões passadas são armazenadas em `.agent/knowledge/` (via a skill `knowledge-base-update`),
+> e não em um DECISIONS_LOG separado. O INDEX.md (Etapa 1) é o seu histórico de decisões.
+
+Se `.agent/CURRENT_TASK.md` existir, trate-o como a fonte da verdade para a sua missão atual.
+Se não existir, pergunte ao usuário qual é a tarefa de hoje antes de prosseguir.
+
+### 4. Mapear a Estrutura do Projeto
+
+Execute uma listagem de diretórios rasa (2 primeiros níveis) para entender a organização:
 
 ```
 src/
@@ -91,63 +95,63 @@ tests/
 .agent/
 ```
 
-Note any non-standard folders and check `.agent/knowledge/` for explanations.
+Anote quaisquer pastas fora do padrão e verifique `.agent/knowledge/` em busca de explicações.
 
-### 5. Check for Active Conventions
+### 5. Verificar as Convenções Ativas
 
-Read `.agent/rules/` if it exists. These are hard constraints — not suggestions.
+Leia `.agent/rules/`, se existir. Estas são restrições rígidas — não são sugestões.
 
-Common rule files to look for:
+Arquivos de regras comuns a procurar:
 - `code-style.md`
 - `commit-messages.md`
 - `test-coverage.md`
 - `no-secrets.md`
 
-### 6. Produce a Context Summary
+### 6. Produzir um Resumo de Contexto
 
-Before doing any task work, output a brief summary in this format:
+Antes de executar qualquer trabalho, emita um breve resumo neste formato:
 
 ```
-## Context Loaded
+## Contexto Carregado
 
-**Project:** <name> — <one-line description>
-**Stack:** <languages, frameworks>
-**Current Task:** <what we're doing today, from CURRENT_TASK.md or user>
-**Relevant Knowledge Entries Loaded:** <list of slugs>
-**Active Rules:** <list or "none found">
-**Open Questions:** <any blockers or undecided things>
-**Ready to proceed:** Yes / No (explain if No)
+**Projeto:** <nome> — <descrição em uma linha>
+**Stack:** <linguagens, frameworks>
+**Tarefa Atual:** <o que vamos fazer hoje, de CURRENT_TASK.md ou do usuário>
+**Entradas de Conhecimento Carregadas:** <lista de slugs>
+**Regras Ativas:** <lista ou "nenhuma encontrada">
+**Perguntas Abertas:** <quaisquer bloqueios ou pontos não decididos>
+**Pronto para prosseguir:** Sim / Não (explique se Não)
 ```
 
-Only after producing this summary should you begin the actual task.
+Só depois de produzir este resumo você deve iniciar a tarefa de fato.
 
-## Rules
+## Regras
 
-- **Never skip this skill** on a new session. A 2-minute scan saves hours of rework.
-- **Don't assume.** If the README contradicts a knowledge entry, flag it — don't silently pick one.
-- **Update CURRENT_TASK.md** at the end of each session with what was done and what's next.
-- **If context is missing**, ask the user the minimum questions needed to fill the gaps before starting.
+- **Nunca pule esta skill** em uma nova sessão. Uma varredura de 2 minutos economiza horas de retrabalho.
+- **Não assuma.** Se o README contradisser uma entrada de conhecimento, sinalize isso — não escolha uma em silêncio.
+- **Atualize CURRENT_TASK.md** ao final de cada sessão com o que foi feito e o que vem a seguir.
+- **Se faltar contexto**, pergunte ao usuário o mínimo de perguntas necessárias para preencher as lacunas antes de começar.
 
-## Maintaining CURRENT_TASK.md
+## Mantendo o CURRENT_TASK.md
 
-At the end of every session, update `.agent/CURRENT_TASK.md`:
+Ao final de toda sessão, atualize `.agent/CURRENT_TASK.md`:
 
 ```markdown
-# Current Task
+# Tarefa Atual
 
-## What We're Building
-<description>
+## O Que Estamos Construindo
+<descrição>
 
 ## Status
-<In Progress | Blocked | Review Needed | Done>
+<Em Andamento | Bloqueado | Requer Revisão | Pronto>
 
-## Last Session Summary
-<date> — <what was done>
+## Resumo da Última Sessão
+<data> — <o que foi feito>
 
-## Next Steps
-1. <next action>
-2. <next action>
+## Próximos Passos
+1. <próxima ação>
+2. <próxima ação>
 
-## Blockers
-- <anything preventing progress>
+## Bloqueios
+- <qualquer coisa que esteja impedindo o avanço>
 ```

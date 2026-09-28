@@ -1,179 +1,181 @@
 ---
 name: incident-response
 description: >
-  When something breaks in production: triage the severity, gather evidence,
-  identify root cause, deploy a fix or mitigation, and write a post-mortem.
-  Provides a calm, structured process for high-stress moments.
+  Quando algo quebra em produção: faça a triagem da severidade, reúna evidências,
+  identifique a causa raiz, faça o deploy de uma correção ou mitigação e escreva
+  um post-mortem. Oferece um processo calmo e estruturado para momentos de
+  alta pressão.
 ---
 
 <!--
-  TÜRKÇE AÇIKLAMA
+  DESCRIÇÃO
   ───────────────
-  Bu skill, production'da bir şey patladığında sakin ve yapılandırılmış bir kriz yönetimi
-  sağlar. Şiddeti sınıflandır → kanıtları topla → kök nedeni bul → düzelt → post-mortem yaz.
-  Panikle atılan komutlar sorunu büyütür; bu skill önce düşün, sonra hareket et prensibini uygular.
+  Esta skill oferece uma gestão de crise calma e estruturada para quando algo
+  quebra em produção. Classifique a severidade → reúna evidências → encontre a
+  causa raiz → corrija → escreva o post-mortem. Comandos executados no panico
+  ampliam o problema; esta skill aplica o princípio "pense primeiro, aja depois".
 
-  NE ZAMAN: Production çöktüğünde, error spike'ta, güvenlik ihlali şüphesinde,
-            deployment sonrası beklenmedik regresyonda.
-  ÇIKTI:    .agent/incidents/INC-<tarih>-<slug>.md — timeline + root cause + action items.
+  QUANDO: Quando a produção cai, em um pico de erros, na suspeita de violação de
+          segurança, em regressões inesperadas após um deploy.
+  SAÍDA:   .agent/incidents/INC-<data>-<slug>.md — timeline + causa raiz + itens de ação.
 -->
 
-# Incident Response Skill
+# Skill de Resposta a Incidentes
 
-## When to Trigger
+## Quando é Disparado
 
-- Production is down or severely degraded
-- Error rate spikes significantly above baseline
-- A customer reports a critical bug in production
-- A security breach or data leak is suspected
-- A deployment caused an unexpected regression
+- A produção está fora do ar ou severamente degradada
+- A taxa de erros dá um pico significativamente acima do baseline
+- Um cliente relata um bug crítico em produção
+- Há suspeita de violação de segurança ou vazamento de dados
+- Um deploy causou uma regressão inesperada
 
-## Step-by-Step Process
+## Processo Passo a Passo
 
-### 1. Declare and Classify the Incident
+### 1. Declare e Classifique o Incidente
 
-**First: breathe. Then classify.**
+**Primeiro: respire. Depois classifique.**
 
-| Severity | Definition | Response Time |
-|----------|-----------|---------------|
-| P1 — Critical | Full outage, data loss, security breach | Immediate |
-| P2 — High | Major feature broken, significant users affected | < 30 min |
-| P3 — Medium | Partial degradation, workaround exists | < 2 hours |
-| P4 — Low | Minor bug, cosmetic issue | Next sprint |
+| Severidade | Definição | Tempo de Resposta |
+|------------|-----------|-------------------|
+| P1 — Crítica | Indisponibilidade total, perda de dados, violação de segurança | Imediato |
+| P2 — Alta | Funcionalidade principal quebrada, muitos usuários afetados | < 30 min |
+| P3 — Média | Degradação parcial, existe uma solução alternativa (workaround) | < 2 horas |
+| P4 — Baixa | Bug menor, questão cosmética | Próximo sprint |
 
-Open `.agent/incidents/INC-<YYYY-MM-DD>-<slug>.md` and write:
+Abra `.agent/incidents/INC-<YYYY-MM-DD>-<slug>.md` e escreva:
 
 ```markdown
-# Incident: <short title>
-**Date:** <YYYY-MM-DD HH:MM UTC>
-**Severity:** P<N>
-**Status:** Investigating
-**Incident Commander:** <name>
+# Incidente: <título curto>
+**Data:** <YYYY-MM-DD HH:MM UTC>
+**Severidade:** P<N>
+**Status:** Investigando
+**Incident Commander:** <nome>
 ```
 
-### 2. Triage — Gather Evidence Fast
+### 2. Triagem — Reúna Evidências Rápido
 
-Don't guess. Collect data first.
+Não adivinhe. Colete os dados primeiro.
 
 Checklist:
-- [ ] What is the user-visible symptom?
-- [ ] When did it start? (check monitoring, not just "someone reported it")
-- [ ] What changed recently? (last deploy, config change, dependency update)
-- [ ] What does the error log say? (get exact error messages + stack traces)
-- [ ] Is it affecting all users or a subset?
-- [ ] Is there an automated alert, or was this user-reported?
+- [ ] Qual é o sintoma visível para o usuário?
+- [ ] Quando começou? (verifique o monitoramento, não apenas "alguém relatou")
+- [ ] O que mudou recentemente? (último deploy, mudança de config, atualização de dependência)
+- [ ] O que o log de erro diz? (obtenha as mensagens de erro exatas + stack traces)
+- [ ] Está afetando todos os usuários ou apenas um subconjunto?
+- [ ] Existe um alerta automático, ou isso foi relatado por um usuário?
 
-Commands to run immediately:
+Comandos para executar imediatamente:
 
 ```bash
-# Recent deploys
+# Deploys recentes
 git log --oneline -20
 
-# Check running process / container health
-# (adjust for your stack)
+# Verificar processo em execução / saúde do container
+# (ajuste para sua stack)
 docker ps
 systemctl status <service>
 
-# Tail live logs
+# Acompanhar logs ao vivo
 docker logs -f <container> --tail 100
 journalctl -u <service> -n 100 -f
 ```
 
-Add findings to the incident file under `## Evidence`.
+Adicione as descobertas ao arquivo do incidente em `## Evidências`.
 
-### 3. Contain the Blast Radius
+### 3. Contenha a Explosão
 
-Before fixing, limit the damage:
+Antes de corrigir, limite os danos:
 
-- **If a bad deploy caused it:** roll back immediately
+- **Se a causa foi um deploy ruim:** reverta imediatamente
   ```bash
   git revert HEAD
-  # or redeploy previous known-good version
+  # ou reimplante a versão anterior conhecida como boa
   ```
-- **If a specific feature is failing:** toggle it off via feature flag
-- **If data is being corrupted:** take the affected service offline temporarily
-- **If a secret was exposed:** rotate it immediately, then investigate
+- **Se uma funcionalidade específica está falhando:** desligue-a via feature flag
+- **Se os dados estão sendo corrompidos:** tire o serviço afetado do ar temporariamente
+- **Se um segredo foi exposto:** rotacione-o imediatamente e depois investigue
 
-Document every action taken in the incident file with timestamps.
+Documente no arquivo do incidente todas as ações tomadas, com timestamps.
 
-### 4. Root Cause Analysis
+### 4. Análise de Causa Raiz
 
-Once contained, find the *real* cause — not just the symptom.
+Uma vez contido, encontre a causa *real* — não apenas o sintoma.
 
-Use the **5 Whys** technique:
+Use a técnica dos **5 Porquês**:
 ```
-Why did users see a 500 error?
-→ Because the database query timed out.
-Why did the query time out?
-→ Because a new index was missing after the migration.
-Why was the index missing?
-→ Because the migration script didn't include CREATE INDEX.
-Why didn't the migration script include it?
-→ Because we don't have a convention for checking query plans before deploy.
-→ Root cause: Missing pre-deploy query plan review process.
+Por que os usuários viram um erro 500?
+→ Porque a consulta ao banco de dados deu timeout.
+Por que a consulta deu timeout?
+→ Porque faltava um novo índice após a migration.
+Por que o índice estava faltando?
+→ Porque o script de migration não incluía CREATE INDEX.
+Por que o script de migration não incluía isso?
+→ Porque não temos uma convenção de verificar query plans antes do deploy.
+→ Causa raiz: processo de revisão de query plan pré-deploy ausente.
 ```
 
-The root cause is almost never the immediate technical failure — it's the process gap that allowed it.
+A causa raiz quase nunca é a falha técnica imediata — é a lacuna de processo que a permitiu.
 
-### 5. Fix and Deploy
+### 5. Corrija e Faça o Deploy
 
-Write the fix:
-- Smallest possible change that resolves the issue
-- Add a test that would have caught this
-- Double-check the fix in staging before production
+Escreva a correção:
+- A menor alteração possível que resolve o problema
+- Adicione um teste que teria pegado isso
+- Verifique a correção em staging antes da produção
 
-Deploy:
-- Monitor metrics during deploy
-- Keep someone watching logs for 15 minutes post-deploy
-- Confirm symptom is resolved with a real user test
+Faça o deploy:
+- Monitore as métricas durante o deploy
+- Deixe alguém olhando os logs por 15 minutos após o deploy
+- Confirme que o sintoma foi resolvido com um teste real de usuário
 
-### 6. Write the Post-Mortem
+### 6. Escreva o Post-Mortem
 
-Within 24h of resolution, write a post-mortem in `.agent/incidents/INC-<date>-<slug>.md`:
+Em até 24h após a resolução, escreva um post-mortem em `.agent/incidents/INC-<date>-<slug>.md`:
 
 ```markdown
-# Post-Mortem: <title>
+# Post-Mortem: <título>
 
-## Summary
-<2-3 sentences: what happened, how long, how many users affected>
+## Resumo
+<2-3 frases: o que aconteceu, por quanto tempo, quantos usuários foram afetados>
 
 ## Timeline
-| Time (UTC) | Event |
-|------------|-------|
-| HH:MM | Issue first occurred (inferred from logs) |
-| HH:MM | First alert / user report |
-| HH:MM | Incident declared |
-| HH:MM | Mitigation applied |
-| HH:MM | Root cause identified |
-| HH:MM | Fix deployed |
-| HH:MM | Incident resolved |
+| Hora (UTC) | Evento |
+|------------|--------|
+| HH:MM | O problema ocorreu pela primeira vez (inferido a partir dos logs) |
+| HH:MM | Primeiro alerta / relato de usuário |
+| HH:MM | Incidente declarado |
+| HH:MM | Mitigação aplicada |
+| HH:MM | Causa raiz identificada |
+| HH:MM | Correção implantada |
+| HH:MM | Incidente resolvido |
 
-## Root Cause
-<The actual root cause — not just the symptom>
+## Causa Raiz
+<A causa raiz real — não apenas o sintoma>
 
-## What Went Well
-- <something that helped — good monitoring, fast rollback, etc.>
+## O Que Deu Certo
+- <algo que ajudou — bom monitoramento, rollback rápido, etc.>
 
-## What Went Poorly
-- <something that made it worse — slow detection, unclear runbook, etc.>
+## O Que Deu Errado
+- <algo que piorou as coisas — detecção lenta, runbook confuso, etc.>
 
 ## Action Items
 
-| Action | Owner | Due Date |
-|--------|-------|----------|
-| Add missing index to migration convention | <name> | <date> |
-| Add test for query performance | <name> | <date> |
-| Set up alert for DB query p99 latency | <name> | <date> |
+| Ação | Responsável | Prazo |
+|------|-------------|-------|
+| Adicionar índice ausente à convenção de migration | <nome> | <data> |
+| Adicionar teste de performance de consultas | <nome> | <data> |
+| Criar alerta para latência p99 de queries no banco | <nome> | <data> |
 ```
 
-### 7. Update the Knowledge Base
+### 7. Atualize a Base de Conhecimento
 
-After the post-mortem, use the `knowledge-base-update` skill to create a `gotcha` entry for the root cause so future agents and developers know about it.
+Após o post-mortem, use a skill `knowledge-base-update` para criar uma entrada do tipo `gotcha` sobre a causa raiz, para que agentes e desenvolvedores futuros saibam a respeito.
 
-## Rules
+## Regras
 
-- **Contain first, diagnose second.** Stopping the bleeding is more important than understanding the wound.
-- **No blame in post-mortems.** Focus on process gaps, not people.
-- **Every incident generates at least one action item.** If nothing changes, it will happen again.
-- **Never declare an incident resolved until a real user confirms the fix.** Metrics can lie; users don't.
-- **All P1/P2 incidents require a post-mortem.** No exceptions.
+- **Contenha primeiro, diagnostique depois.** Parar o sangramento é mais importante do que entender o ferimento.
+- **Sem culpa nos post-mortems.** Foque nas lacunas de processo, não nas pessoas.
+- **Todo incidente gera pelo menos um action item.** Se nada mudar, vai acontecer de novo.
+- **Nunca declare um incidente resolvido antes que um usuário real confirme a correção.** Métricas podem mentir; usuários não.
+- **Todos os incidentes P1/P2 exigem post-mortem.** Sem exceções.

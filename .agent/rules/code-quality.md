@@ -1,103 +1,104 @@
 <!--
-  TÜRKÇE AÇIKLAMA
+  DESCRIÇÃO
   ───────────────
-  Kodun tekrar kullanılabilir ve anlaşılabilir kalmasını sağlayan kurallar.
-  DRY prensibi uygulanır ama over-engineering yapılmaz.
-  "Yeterince iyi" ile "aşırı soyutlama" arasındaki dengeyi tanımlar.
+  Regras que mantêm o código reutilizável e compreensível.
+  O princípio DRY é aplicado, mas sem over-engineering.
+  Define o equilíbrio entre "bom o suficiente" e "abstração excessiva".
 -->
 
 ---
 name: code-quality
 description: >
-  Enforces DRY without over-engineering. Duplicate code is refactored when
-  it appears 3+ times or would cause bugs if not updated consistently.
-  Abstractions must earn their complexity — no premature generalization.
+  Exige DRY sem over-engineering. Código duplicado é refatorado quando
+  aparece 3+ vezes ou causaria bugs se não fosse atualizado de forma
+  consistente. Abstrações devem justificar sua complexidade — sem
+  generalização prematura.
 ---
 
-# Code Quality Rules
+# Regras de Qualidade de Código
 
-## 1. DRY Prensibi — Ama Aşırıya Kaçmadan
+## 1. Princípio DRY — Sem Exagerar
 
-### Ne Zaman Refactor Edilir?
-Aynı kod bloğu **3 veya daha fazla** yerde tekrar ediyorsa → extract et.
+### Quando Refatorar?
+Se o mesmo bloco de código se repete em **3 ou mais** lugares → extraia.
 
 ```typescript
-// ❌ 3 yerde tekrar eden aynı doğrulama
-if (!email || !email.includes('@')) throw new Error('Invalid email');  // kullanıcı kaydında
-if (!email || !email.includes('@')) throw new Error('Invalid email');  // login'de
-if (!email || !email.includes('@')) throw new Error('Invalid email');  // şifre sıfırlamada
+// ❌ A mesma validação repetida em 3 lugares
+if (!email || !email.includes('@')) throw new Error('Invalid email');  // no cadastro de usuário
+if (!email || !email.includes('@')) throw new Error('Invalid email');  // no login
+if (!email || !email.includes('@')) throw new Error('Invalid email');  // na redefinição de senha
 
-// ✅ Bir kez yaz, her yerde kullan
+// ✅ Escreva uma vez, use em todos os lugares
 function validateEmail(email: string): void {
   if (!email || !email.includes('@')) throw new ValidationError('Invalid email');
 }
 ```
 
-### Ne Zaman Refactor EDİLMEZ?
-İki benzer kod parçası farklı bağlamlarda çalışıyorsa — aynı "görünüyor" diye birleştirme. Yanlış soyutlama, tekrarlayan koddan daha kötüdür.
+### Quando NÃO Refatorar?
+Se dois trechos de código semelhantes funcionam em contextos diferentes — não unifique só porque "parecem iguais". Uma abstração errada é pior do que código repetido.
 
 ```
-❌ Aşırı soyutlama tuzağı:
-"Bu iki fonksiyon %80 benziyor, birleştirelim."
-→ 3 ay sonra biri değişti, diğeri değişmedi — şimdi 10 parametre + 5 if bloğu var.
+❌ Armadilha da abstração excessiva:
+"Estas duas funções são 80% iguais, vamos unificar."
+→ 3 meses depois uma mudou e a outra não — agora há 10 parâmetros + 5 blocos if.
 
-✅ Doğru yaklaşım:
-Kod benzer görünse de, değişme sebepleri farklıysa → ayrı tut.
+✅ Abordagem correta:
+Mesmo que o código pareça semelhante, se os motivos de mudança forem diferentes → mantenha separado.
 ```
 
 ---
 
-## 2. Soyutlama Eşiği
+## 2. Limite de Abstração
 
-Yeni bir soyutlama (helper function, class, util module) oluşturmadan önce:
+Antes de criar uma nova abstração (helper function, class, util module):
 
-- [ ] Bu kodu 3+ yerde mi kullanıyorum?
-- [ ] Bu kodu çıkarınca her kullanım yeri daha mı okunabilir, daha mı karmaşık?
-- [ ] Bu soyutlamayı 6 ay sonra başka biri anlayabilir mi?
+- [ ] Estou usando este código em 3+ lugares?
+- [ ] Ao extrair este código, cada ponto de uso fica mais legível ou mais complexo?
+- [ ] Outra pessoa consegue entender esta abstração daqui a 6 meses?
 
-3 soruya da "evet" → extract et.  
-Birinde "hayır" → olduğu yerde bırak.
+Se a resposta for "sim" para as 3 perguntas → extraia.  
+Se uma for "não" → deixe no lugar.
 
 ---
 
-## 3. Overdesign Göstergeleri
+## 3. Indicadores de Overdesign
 
-Şu işaretlerden biri görünüyorsa → dur, kullanıcıya bildir:
+Se você notar qualquer um destes sinais → pare e avise o usuário:
 
-| Gösterge | Ne Anlama Gelir |
+| Sinal | O que significa |
 |----------|----------------|
-| Factory'nin Factory'si | Çok fazla dolaylı yönlendirme |
-| 5'ten fazla parametre alan fonksiyon | Görev çok büyük, böl |
-| Interface'i sadece 1 yer implement ediyor | Erken soyutlama |
-| Util klasöründe 20+ küçük fonksiyon | Organize edilmemiş sepetin büyümesi |
-| Her şey konfigüre edilebilir | Ne yapacağı belirsiz |
+| Factory de factory | Excesso de indireção |
+| Função com mais de 5 parâmetros | Tarefa grande demais, divida |
+| Interface implementada em apenas 1 lugar | Abstração prematura |
+| 20+ funções pequenas em um diretório util | Crescimento de um cesto desorganizado |
+| Tudo é configurável | Não fica claro o que aquilo faz |
 
 ---
 
-## 4. Refactor Zamanı
+## 4. Momento da Refatoração
 
-Refactor yapılabilecek durumlar:
+Situações em que a refatoração pode ser feita:
 
-- **Görev sırasında tespit edildi** → görevi bitir, sonra ayrı commit'te refactor et
-- **Refactor bir feature'ın önkoşulu** → önce refactor commit at, sonra feature'ı ekle (tek PR'da 2 ayrı commit)
-- **Refactor büyük** (5+ dosya etkileniyor) → ayrı branch, ayrı PR
+- **Detectado durante a tarefa** → termine a tarefa e depois refatore em um commit separado
+- **O refactor é pré-requisito de uma feature** → faça primeiro o commit do refactor e depois adicione a feature (2 commits separados no mesmo PR)
+- **Refactor grande** (afeta 5+ arquivos) → branch separada, PR separada
 
 ```bash
-# ✅ Doğru commit sırası
+# ✅ Ordem correta dos commits
 git commit -m "refactor(validation): extract email validation to shared util"
 git commit -m "feat(auth): add password reset flow using shared email validator"
 
-# ❌ Yanlış — ikisi aynı commit'te
+# ❌ Errado — os dois no mesmo commit
 git commit -m "feat(auth): add password reset + clean up email validation"
 ```
 
 ---
 
-## 5. "Yeterince İyi" Prensibi
+## 5. Princípio do "Bom o Suficiente"
 
-Her fonksiyon şu soruyu geçmeli:
+Toda função deve passar por esta pergunta:
 
-> **"Bu kodu 6 ay sonra ilk kez gören biri, ne yaptığını 2 dakikada anlayabilir mi?"**
+> **"Alguém que veja este código pela primeira vez daqui a 6 meses consegue entender o que ele faz em 2 minutos?"**
 
-- Evet → yeterince iyi, devam et
-- Hayır → yeniden yaz (yorum ekleme — kodu netleştir)
+- Sim → bom o suficiente, continue
+- Não → reescreva (não adicione comentários — deixe o código claro)

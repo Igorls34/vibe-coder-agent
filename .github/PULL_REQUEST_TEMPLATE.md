@@ -1,24 +1,24 @@
-## Ne Değişti?
+## O que Mudou?
 
-<!-- 2-3 cümle: ne yapıldı, neden -->
+<!-- 2-3 frases: o que foi feito, por quê -->
 
-## Değişiklik Türü
+## Tipo de Mudança
 
-<!-- Uygun olanları işaretleyin -->
-- [ ] Yeni skill veya agent eklendi
-- [ ] Mevcut skill/agent güncellendi
-- [ ] Kural (rule) değişikliği
-- [ ] Dokümantasyon güncellemesi
-- [ ] Bug düzeltmesi
+<!-- Marque os que se aplicam -->
+- [ ] Nova skill ou agent adicionado(a)
+- [ ] Skill/agent existente atualizado(a)
+- [ ] Mudança de regra (regra)
+- [ ] Atualização de documentação
+- [ ] Correção de bug
 
-## Kontrol Listesi
+## Checklist
 
-- [ ] `code-review` skill çalıştırıldı (self-review)
-- [ ] BREAKING CHANGE varsa CHANGELOG güncellendi
-- [ ] Yeni env variable varsa `.env.example` eklendi
-- [ ] `documentation-sync` skill çalıştırıldı (API veya yapı değişikliği varsa)
+- [ ] Skill `code-review` executada (auto-revisão)
+- [ ] CHANGELOG atualizado, se houver BREAKING CHANGE
+- [ ] `.env.example` atualizado, se houver nova env variable
+- [ ] Skill `documentation-sync` executada (se houver mudança de API ou de estrutura)
 
-## İlgili
+## Relacionados
 
-<!-- İlgili issue, scope dokümanı veya plan bağlantısı -->
+<!-- Issue relacionada, documento de scope ou link do plano -->
 - Closes #
